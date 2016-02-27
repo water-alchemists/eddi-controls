@@ -1,39 +1,45 @@
-/*
-Master Pins
-Pin 2(GPIO/Latching) -  Open the Master Valve.
-Pin 3(GPIO/Latching) -  Close the Master Valve
-Pin 4(GPIO) - Activate Power Source (120vac) - Solid State Relay
-Channel Pins
-Pin 8(GPIO) - Cause a voltage across the edr to be from left to right (120vdc)
-Pin 9(GPIO) - Cause a voltage across the edr to be from right to left (120vdc)
-Pin 10(GPIO/Latching) -
-	1) Make the clean water come out of the top manifold
-	2) Make the salty circulation flow through the bottom manifolds
-Pin 11(GPIO/Latching) -
-	1) Make the clean water come out of the bottom manifold
-	2) Make the salty circulation flow through the top manifolds
-Circulation Pins
-Pin 12(GPIO) - Open the Dump valve. The valve will remain open as long as this pin is active.
-Pin 13(GPIO) - Activate the circulation pump. The pump will remain active as long as this pin is active.
-*/
-
-#define PIN_MASTER_OPEN 2
-#define PIN_MASTER_CLOSE 3
-#define PIN_POWER 4
-
-#define PIN_POWER_CHANNEL_A 8
-#define PIN_POWER_CHANNEL_B 9
-#define PIN_VALVE_CHANNEL_A 10
-#define PIN_VALVE_CHANNEL_B 11
-
-#define PIN_DUMP 12
-#define PIN_RECIRCULATE 13
-
-struct timespec valveLatchTime;
+var fs = require('fs');
+var Pin = require('./pin');
+var LatchingPinPair = require('./LatchingPinPair');
 
 
-char * pins[13];
+// https://docs.google.com/document/d/10JIoueW5nWawstjQoYBl2q0yIJkiKjjHA8fwlIf_kPw/edit
 
+var CONTROL = {
+  MASTER:           new LatchingPinPair(2 , 3 , 200);
+  POWER:            new Pin(4),
+  PUMP:             new Pin(7),
+  POWER_CHANNEL:    new LatchingPinPair(8 , 9 , 200);
+  VALVE_CHANNEL:    new LatchingPinPair(10, 11, 200);
+  DUMP:             new LatchingPinPair(12, 13, 200);
+};
+
+var CYCLE = {
+  OFF: function(){
+    CONTROL.MASTER.setB();
+    CONTROL.POWER.off();
+    CONTROL.PUMP.off();
+    CONTROL.POWER_CHANNEL.setA();
+    CONTROL.VALVE_CHANNEL.setA();
+    CONTROL.DUMP.setB();
+  },
+  PRIME: function(){
+    CONTROL.MASTER.setA();
+    CONTROL.POWER.off();
+    CONTROL.PUMP.on();
+    CONTROL.POWER_CHANNEL.setA();
+    CONTROL.VALVE_CHANNEL.setA();
+    CONTROL.DUMP.setA();
+  },
+  CHANNEL_A: function(){
+    CONTROL.MASTER.setA();
+    CONTROL.POWER.on();
+    CONTROL.PUMP.off();
+  }
+
+};
+
+var currentCycle = CYCLE.OFF;
 
 /*
 Cycle Specifications
