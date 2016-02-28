@@ -2,6 +2,7 @@
 
 var Pin = function(num){
   this.file = "/sys/class/gpio/gpio"+num+"/value";
+  this.state = null;
   fs.writeFile("/sys/class/gpio/export", num+"\n", function(err){
     if( err ){
       console.error(err);
@@ -17,11 +18,16 @@ var Pin = function(num){
 }
 
 Pin.prototype._set(val){
+  this.state = val;
   fs.writeFile(this.file, val+"\n", function(err){
     if( err ){
       console.error(err);
     }
   });
+}
+
+Pin.prototype.isOn(){
+  return this.state === 1;
 }
 
 Pin.prototype.on(){

@@ -8,6 +8,7 @@ var LatchingPinPair = function(numA, numB, timeout){
 
 
 LatchingPinPair.prototype._set = function(pin){
+  this.state = (pin === this.pinA);
   if( this.activeTimeout ){
     clearTimeout(this.activeTimeout);
     if( this.pinA === pin ){
@@ -30,6 +31,10 @@ LatchingPinPair.prototype.setA = function(){
 
 LatchingPinPair.prototype.setB = function(){
   this._set(this.pinB);
+}
+
+LatchingPinPair.prototype.isA = function(){
+  return this.state === this.pinA;
 }
 
 LatchingPinPair.prototype.off = function(){
