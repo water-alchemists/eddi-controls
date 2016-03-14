@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 
 
 var Pin = function(num){
@@ -17,7 +19,7 @@ var Pin = function(num){
   });
 }
 
-Pin.prototype._set(val){
+Pin.prototype._set = function(val){
   this.state = val;
   fs.writeFile(this.file, val+"\n", function(err){
     if( err ){
@@ -26,15 +28,15 @@ Pin.prototype._set(val){
   });
 }
 
-Pin.prototype.isOn(){
+Pin.prototype.isOn = function(){
   return this.state === 1;
 }
 
-Pin.prototype.on(){
+Pin.prototype.on = function(){
   this._set(1);
 }
 
-Pin.prototype.off(){
+Pin.prototype.off = function(){
   this._set(0);
 }
 

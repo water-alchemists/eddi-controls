@@ -44,3 +44,6 @@ LatchingPinPair.prototype.off = function(){
     this.pinB.off();
   }
 }
+
+
+module.exports = LatchingPinPair;
