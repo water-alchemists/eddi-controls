@@ -16,6 +16,7 @@ var gpio = {
 
 var Pin = function(pin){
   var num = gpio[pin];
+  this.pin = pin;
   this.file = "/sys/class/gpio/gpio"+num+"/value";
   this.state = null;
   fs.writeFile("/sys/class/gpio/export", num+"\n", function(err){
@@ -35,6 +36,7 @@ var Pin = function(pin){
 
 Pin.prototype._set = function(val){
   this.state = val;
+  console.log("Writing to pin "+this.pin+", value: "+val);
   fs.writeFile(this.file, val+"\n", function(err){
     if( err ){
       console.error(err);
