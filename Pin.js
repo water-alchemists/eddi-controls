@@ -1,8 +1,21 @@
 var fs = require('fs');
 
+var gpio = {
+  2 : 8,
+  3 : 9,
+  4 : 10,
+  7 : 11,
+  8 : 12,
+  9 : 13,
+  10 : 14,
+  11 : 16,
+  12 : 21,
+  13 : 22
+};
 
 
-var Pin = function(num){
+var Pin = function(pin){
+  var num = gpio[pin];
   this.file = "/sys/class/gpio/gpio"+num+"/value";
   this.state = null;
   fs.writeFile("/sys/class/gpio/export", num+"\n", function(err){
