@@ -1,5 +1,5 @@
 var fs = require('fs');
-var Pin = require('./pin');
+var Pin = require('./Pin');
 var LatchingPinPair = require('./LatchingPinPair');
 
 
