@@ -10,13 +10,14 @@ var Pin = function(num){
       console.error(err);
       process.exit(1);
     }
+    fs.writeFile("/sys/class/gpio/gpio"+num+"/direction", "out\n", function(err){
+      if( err ){
+        console.error(err);
+        process.exit(1);
+      }
+    });
   });
-  fs.writeFile("/sys/class/gpio/gpio"+num+"/direction", "out\n", function(err){
-    if( err ){
-      console.error(err);
-      process.exit(1);
-    }
-  });
+  
 }
 
 Pin.prototype._set = function(val){
