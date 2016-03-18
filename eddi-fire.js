@@ -23,7 +23,7 @@ const EDDI_ID = process.env.EDDI_ID;
 
 class EddiFire {
 	constructor(){
-		const ref = new Firebase(PATHS.BASE_PATH);
+		const ref = new Firebase(PATHS.BASE);
 
 		this.EDDI = ref.child(PATHS.EDDI).child(EDDI_ID);
 
