@@ -168,4 +168,4 @@ setInterval(function(){
     });
   }
 }, 1000);
-this pattern prevents tail recursion
+// this pattern prevents tail recursion
