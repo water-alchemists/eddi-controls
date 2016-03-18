@@ -78,6 +78,7 @@ var CYCLE = {
 };
 
 var currentCycle = CYCLE.OFF;
+var OVERIDE_OFF = false;
 var start = {
     hour : 9,
     minute : 0
@@ -110,17 +111,15 @@ function getCycleState(search){
 
 function updateStart(newStart){
   start = newStart;
-  console.log('got the new start', start);
 }
 
 function updateEnd(newEnd){
   end = newEnd;
-  console.log('new end', end);
 }
 
 function updateCycle(state){
-  if(state === 0) currentCycle = CYCLE.OFF;
-  else if(state === 1) currentCycle = CYCLE.PRIME;
+  if(state === 0) OVERRIDE_OFF = true;
+  else if(state === 1) OVERRIDE_OFF = false;
 }
 
 //register event listeners
@@ -149,6 +148,9 @@ function nextCycle(onReady){
 
   // TODO: Check for start and end time;
   if(!checkTime()) currentCycle = CYCLE.OFF;
+
+  //check to see if user asked for it to be turned off
+  if(OVERRIDE_OFF) currentCycle = CYCLE.OFF;
 
   // Trigger next cycle
   currentCycle(onReady);
