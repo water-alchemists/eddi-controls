@@ -1,0 +1,23 @@
+{
+  "name": "eddi-controls",
+  "version": "1.0.0",
+  "description": "Handles updating of pins based on user input",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/water-alchemists/eddi-controls.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/water-alchemists/eddi-controls/issues"
+  },
+  "homepage": "https://github.com/water-alchemists/eddi-controls#readme",
+  "dependencies": {
+    "firebase": "^2.4.1"
+  }
+}
