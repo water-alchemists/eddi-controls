@@ -47,7 +47,7 @@ class EddiFire {
 			.on('value', snapshot => {
 				//get and parse value
 				const data = snapshot.val();
-
+				console.log(`EddiFire alerting of state change : ${data}`);
 				//updates the value from firebase for referencing later
 				this.state = data;
 
@@ -67,7 +67,7 @@ class EddiFire {
 						mins = data[PATHS.MINUTE];
 					data = new Date().setHours(hrs).setMinutes(mins);
 				}
-
+				console.log(`EddiFire alerting of start time change : ${data}`);
 				//updates the value from firebase for referencing later
 				this.start = data;
 
@@ -87,6 +87,8 @@ class EddiFire {
 						mins = data[PATHS.MINUTE];
 					data = new Date().setHours(hrs).setMinutes(mins);
 				}
+
+				console.log(`EddiFire alerting of end time change : ${data}`);
 
 				//updates the value from firebase for referencing later
 				this.end = data;
@@ -110,6 +112,18 @@ class EddiFire {
 		if(!type) throw new Error(`Not a valid event type. These are valid : ${Object.keys(EVENTS).reduce((accum, key) => `${accum} "${key}"`, '')}`);
 		const index = this.subscribers[type].indexOf(func);
 		if(index > -1) this.subscribers[type].splice(index, 1);
+	}
+
+	alertState(newState){
+		return new Promise((resolve, reject) => {
+			this.EDDI
+			.child(PATHS.STATE)
+			.set(newState, err => {
+				if(err) return reject(err);
+				console.log(`EddiFire alerted of state change to : ${newState}`);
+				resolve();
+			});
+		});
 	}
 
 }
