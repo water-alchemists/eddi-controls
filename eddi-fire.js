@@ -19,13 +19,18 @@ const EVENTS = {
 	state : 'state'
 };
 
-const EDDI_ID = process.env.EDDI_ID;
+const EDDI_ID = process.env.EDDI_ID || 'test-teddi';
 
 class EddiFire {
 	constructor(){
-		const ref = new Firebase(PATHS.BASE);
+		const ref = new Firebase(PATHS.BASE),
+			EDDI = ref.child(PATHS.EDDI).child(EDDI_ID);
 
-		this.EDDI = ref.child(PATHS.EDDI).child(EDDI_ID);
+		this.refs = {
+			[EVENTS.state] : EDDI.child(PATHS.SETTINGS).child(PATHS.STATE),
+			[EVENTS.start] : EDDI.child(PATHS.SETTINGS).child(PATHS.TIMING).child(PATHS.START),
+			[EVENTS.end] : EDDI.child(PATHS.SETTINGS).child(PATHS.TIMING).child(PATHS.END)
+		}
 
 		this.subscribers = {
 			[EVENTS.start] : [],
@@ -41,12 +46,11 @@ class EddiFire {
 
 	init(){
 		//alert all functions listening to the change of the state
-		this.EDDI
-			.child(PATHS.SETTINGS)
-			.child(PATHS.STATE)
+		this.refs[EVENTS.state]
 			.on('value', snapshot => {
 				//get and parse value
 				const data = snapshot.val();
+
 				console.log(`EddiFire alerting of state change : ${data}`);
 				//updates the value from firebase for referencing later
 				this.state = data;
@@ -56,17 +60,11 @@ class EddiFire {
 			});
 
 		//alert all functions listening to the change of the start time
-		this.EDDI
-			.child(PATHS.SETTINGS)
-			.child(PATHS.START)
+		this.refs[EVENTS.start]
 			.on('value', snapshot => {
 				//get and parse value
-				var data = snapshot.val();
-				if(data) {
-					const hrs = data[PATHS.HOUR],
-						mins = data[PATHS.MINUTE];
-					data = new Date().setHours(hrs).setMinutes(mins);
-				}
+				const data = snapshot.val();
+
 				console.log(`EddiFire alerting of start time change : ${data}`);
 				//updates the value from firebase for referencing later
 				this.start = data;
@@ -76,17 +74,10 @@ class EddiFire {
 			});
 
 		//alert all functions listening to the change of the end time
-		this.EDDI
-			.child(PATHS.SETTINGS)
-			.child(PATHS.END)
+		this.refs[EVENTS.end]
 			.on('value', snapshot => {
 				//get and parse value
-				var data = snapshot.val();
-				if(data) {
-					const hrs = data[PATHS.HOUR],
-						mins = data[PATHS.MINUTE];
-					data = new Date().setHours(hrs).setMinutes(mins);
-				}
+				const data = snapshot.val();
 
 				console.log(`EddiFire alerting of end time change : ${data}`);
 
@@ -114,16 +105,36 @@ class EddiFire {
 		if(index > -1) this.subscribers[type].splice(index, 1);
 	}
 
-	alertState(newState){
+	alertState(stateText){
+		const mapping = {
+			OFF : 0,
+			PRIME : 1,
+			CHANNEL_A : 2, 
+			CHANNEL_B : 3
+		},
+		newState = mapping[stateText],
+		update = {
+			state : newState,
+			updated : new Date.getTime()
+		};
+
 		return new Promise((resolve, reject) => {
 			this.EDDI
 			.child(PATHS.STATE)
-			.set(newState, err => {
+			.set(update, err => {
 				if(err) return reject(err);
 				console.log(`EddiFire alerted of state change to : ${newState}`);
 				resolve();
 			});
 		});
+	}
+
+	exit(){
+		//reset all subscribers
+		Object.keys(this.subscribers).forEach(key => this.subscribers[key] = []);
+
+		//clean all listeners
+		Object.keys(this.refs).forEach(key => this.refs[key].off());
 	}
 
 }

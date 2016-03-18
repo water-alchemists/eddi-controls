@@ -1,7 +1,10 @@
-var fs = require('fs');
-var Pin = require('./Pin');
-var LatchingPinPair = require('./LatchingPinPair');
+'use strict';
+const fs = require('fs');
+const Pin = require('./Pin');
+const LatchingPinPair = require('./LatchingPinPair');
+const EddiFireStarter = require('./eddi-fire');
 
+const EddiFire = EddiFireStarter();
 
 // https://docs.google.com/document/d/10JIoueW5nWawstjQoYBl2q0yIJkiKjjHA8fwlIf_kPw/edit
 
@@ -75,12 +78,59 @@ var CYCLE = {
 };
 
 var currentCycle = CYCLE.OFF;
+var start = {
+    hour : 9,
+    minute : 0
+  },
+  end = {
+    hour : 15,
+    minute : 0
+  };
 
+function checkTime(){
+  //checks to see if the current time is within scheduled time
+  const startTime = new Date(),
+    endTime = new Date(),
+    current = new Date();
 
+    //set start date
+    startTime.setHours(start.hour);
+    startTime.setMinutes(start.minute);
+
+    //set end date
+    endTime.setHours(end.hour);
+    endTime.setMinutes(end.minute);
+
+  return current < endTime && current > startTime;
+}
+
+function getCycleState(search){
+  return Object.keys(CYCLE).reduce((result, key) => CYCLE[key] === search ? key : result, null);
+}
+
+function updateStart(newStart){
+  start = newStart;
+  console.log('got the new start', start);
+}
+
+function updateEnd(newEnd){
+  end = newEnd;
+  console.log('new end', end);
+}
+
+function updateCycle(state){
+  if(state === 0) currentCycle = CYCLE.OFF;
+  else if(state === 1) currentCycle = CYCLE.PRIME;
+}
+
+//register event listeners
+EddiFire.register('start', updateStart);
+EddiFire.register('end', updateEnd);
+EddiFire.register('state', updateCycle);
+
+EddiFire.init();
 
 function nextCycle(onReady){
-
-  // TODO: Check for start and end time;
 
   switch(currentCycle){
     case CYCLE.OFF:
@@ -97,11 +147,17 @@ function nextCycle(onReady){
       break;
   }
 
+  // TODO: Check for start and end time;
+  if(!checkTime()) currentCycle = CYCLE.OFF;
+
+  // Trigger next cycle
   currentCycle(onReady);
+
+  // TODO: Update firebase
+  EddiFire.alertState(getCycleState(currentCycle));
 
   // TODO: Report when cycle change happens to socket
 }
-
 
 var locked = false;
 setInterval(function(){
@@ -112,4 +168,4 @@ setInterval(function(){
     });
   }
 }, 1000);
-// this pattern prevents tail recursion
+this pattern prevents tail recursion
