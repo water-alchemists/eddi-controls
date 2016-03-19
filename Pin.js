@@ -19,28 +19,39 @@ var Pin = function(pin){
   this.pin = pin;
   this.file = "/sys/class/gpio/gpio"+num+"/value";
   this.state = null;
-  fs.writeFile("/sys/class/gpio/export", num+"\n", function(err){
-    if( err ){
-      console.error(err);
+  return new Promise((resolve, reject) => {
+      fs.writeFile("/sys/class/gpio/export", num+"\n", function(err){
+        if(err) return reject(err);
+        resolve();
+      });
+    })
+    .then(() => {
+      return new Promise((resolve, reject) => {
+        fs.writeFile("/sys/class/gpio/gpio"+num+"/direction", "out\n", function(err){
+          if( err ) return reject(err);
+          resolve();
+        });
+      })
+    })
+    .catch(error => {
+      console.error(error);
       process.exit(1);
-    }
-    fs.writeFile("/sys/class/gpio/gpio"+num+"/direction", "out\n", function(err){
-      if( err ){
-        console.error(err);
-        process.exit(1);
-      }
+      throw error;
     });
-  });
-  
+
 }
 
 Pin.prototype._set = function(val){
   this.state = val;
   console.log("Writing to pin "+this.pin+", value: "+val);
-  fs.writeFile(this.file, val+"\n", function(err){
-    if( err ){
-      console.error(err);
-    }
+  return new Promise((resolve, reject) => {
+    fs.writeFile(this.file, val+"\n", function(err){
+      if( err ){
+        console.error(err);
+        return reject(err);
+      }
+      resolve();
+    });
   });
 }
 
@@ -49,11 +60,11 @@ Pin.prototype.isOn = function(){
 }
 
 Pin.prototype.on = function(){
-  this._set(1);
+  return this._set(1);
 }
 
 Pin.prototype.off = function(){
-  this._set(0);
+  return this._set(0);
 }
 
 

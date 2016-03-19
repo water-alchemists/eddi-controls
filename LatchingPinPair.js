@@ -26,11 +26,11 @@ LatchingPinPair.prototype._set = function(pin){
 }
 
 LatchingPinPair.prototype.setA = function(){
-  this._set(this.pinA);
+  return this._set(this.pinA);
 }
 
 LatchingPinPair.prototype.setB = function(){
-  this._set(this.pinB);
+  return this._set(this.pinB);
 }
 
 LatchingPinPair.prototype.isA = function(){
