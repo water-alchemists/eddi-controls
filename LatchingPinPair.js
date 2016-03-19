@@ -1,4 +1,6 @@
-var Pin = require("./Pin")
+'use strict';
+const Pin = require("./Pin"),
+  promiseAdditions = require('./promise-additions');
 
 var LatchingPinPair = function(numA, numB, timeout){
   this.pinA = new Pin(numA);
@@ -14,18 +16,13 @@ LatchingPinPair.prototype.initialize = function(){
 
 
 LatchingPinPair.prototype._set = function(pin){
-  return new Promise( (resolve, reject) => {
-    if( !this.ready ){
-      reject(new Error("You must initialize a LatchingPinPair before using it"));
-    }
-    this.state = (pin === this.pinA);
-
-    pin.on();
-    setTimeout(function(){
-      pin.off();
-      resolve();
-    }, this.timeout);
-  });
+  if( !this.ready ){
+    return Promise.reject(new Error("You must initialize a LatchingPinPair before using it"));
+  }
+  this.state = (pin === this.pinA);
+  return pin.on()
+    .then(() => promiseAdditions.delay(this.timeout))
+    .then(() => pin.off());
 }
 
 LatchingPinPair.prototype.setA = function(){
@@ -41,11 +38,17 @@ LatchingPinPair.prototype.isA = function(){
 }
 
 LatchingPinPair.prototype.off = function(){
-  if( this.activeTimeout ){
-    clearTimeout(this.activeTimeout);
-    this.pinA.off();
-    this.pinB.off();
-  }
+  const actions = [
+    this.pinA.off(),
+    this.pinB.off()
+  ];
+
+  return Promise.all(actions);
+  // if( this.activeTimeout ){
+  //   clearTimeout(this.activeTimeout);
+  //   this.pinA.off();
+  //   this.pinB.off();
+  // }
 }
 
 

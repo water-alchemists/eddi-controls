@@ -40,17 +40,18 @@ Pin.prototype.initialize = function(){
   });
 }
 
+
 Pin.prototype._set = function(val){
-  return new Promise( (resolve, reject) => {
+  this.state = val;
+  console.log("Writing to pin "+this.pin+", value: "+val);
+  return new Promise((resolve, reject) => {
     if( !this.ready ){
       reject( new Error("You must initialize a Pin before using it") );
     }
-    this.state = val;
-    console.log("Writing to pin "+this.pin+", value: "+val);
     fs.writeFile(this.file, val+"\n", function(err){
       if( err ){
         console.error(err);
-        reject(err);
+        return reject(err);
       }
       resolve();
     });
