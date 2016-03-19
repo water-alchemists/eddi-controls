@@ -6,31 +6,34 @@ var LatchingPinPair = function(numA, numB, timeout){
   this.timeout = timeout || 200;
 }
 
+LatchingPinPair.prototype.initialize = function(){
+  return Promise.all([this.pinA.initialize, this.pinB.initialize]).then( () => {
+    this.ready = true;
+  });
+}
+
 
 LatchingPinPair.prototype._set = function(pin){
-  this.state = (pin === this.pinA);
-  if( this.activeTimeout ){
-    clearTimeout(this.activeTimeout);
-    if( this.pinA === pin ){
-      this.pinB.off();
-    } else {
-      this.pinA.off();
+  return new Promise( (resolve, reject) => {
+    if( !this.ready ){
+      reject(new Error("You must initialize a LatchingPinPair before using it"));
     }
-  }
+    this.state = (pin === this.pinA);
 
-  pin.on();
-
-  this.activeTimeout = setTimeout(function(){
-    pin.off();
-  }, this.timeout);
+    pin.on();
+    setTimeout(function(){
+      pin.off();
+      resolve();
+    }, this.timeout);
+  });
 }
 
 LatchingPinPair.prototype.setA = function(){
-  this._set(this.pinA);
+  return this._set(this.pinA);
 }
 
 LatchingPinPair.prototype.setB = function(){
-  this._set(this.pinB);
+  return this._set(this.pinB);
 }
 
 LatchingPinPair.prototype.isA = function(){

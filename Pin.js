@@ -15,32 +15,45 @@ var gpio = {
 
 
 var Pin = function(pin){
-  var num = gpio[pin];
+  this.num = gpio[pin];
   this.pin = pin;
-  this.file = "/sys/class/gpio/gpio"+num+"/value";
+  this.file = "/sys/class/gpio/gpio"+this.num+"/value";
   this.state = null;
-  fs.writeFile("/sys/class/gpio/export", num+"\n", function(err){
-    if( err ){
-      console.error(err);
-      process.exit(1);
-    }
-    fs.writeFile("/sys/class/gpio/gpio"+num+"/direction", "out\n", function(err){
+}
+
+Pin.prototype.initialize = function(){
+  return new Promise( (resolve, reject) => {
+    fs.writeFile("/sys/class/gpio/export", this.num+"\n", (err) => {
       if( err ){
         console.error(err);
         process.exit(1);
       }
+      fs.writeFile("/sys/class/gpio/gpio"+this.num+"/direction", "out\n", (err) => {
+        if( err ){
+          console.error(err);
+          process.exit(1);
+        }
+        this.ready = true;
+        resolve();
+      });
     });
   });
-  
 }
 
 Pin.prototype._set = function(val){
-  this.state = val;
-  console.log("Writing to pin "+this.pin+", value: "+val);
-  fs.writeFile(this.file, val+"\n", function(err){
-    if( err ){
-      console.error(err);
+  return new Promise( (resolve, reject) => {
+    if( !this.ready ){
+      reject( new Error("You must initialize a Pin before using it") );
     }
+    this.state = val;
+    console.log("Writing to pin "+this.pin+", value: "+val);
+    fs.writeFile(this.file, val+"\n", function(err){
+      if( err ){
+        console.error(err);
+        reject(err);
+      }
+      resolve();
+    });
   });
 }
 
@@ -49,11 +62,11 @@ Pin.prototype.isOn = function(){
 }
 
 Pin.prototype.on = function(){
-  this._set(1);
+  return this._set(1);
 }
 
 Pin.prototype.off = function(){
-  this._set(0);
+  return this._set(0);
 }
 
 

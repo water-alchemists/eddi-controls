@@ -18,62 +18,79 @@ var CONTROL = {
 };
 
 var CYCLE = {
-  OFF: function(onReady){
-    CONTROL.MASTER.setB(); // closed
-    CONTROL.POWER.off();
-    CONTROL.PUMP.off();
-    CONTROL.POWER_CHANNEL.setA();
-    CONTROL.VALVE_CHANNEL.setA();
-    CONTROL.DUMP.setB(); // closed
-    onReady();
+  OFF: function(){
+    return CONTROL.MASTER.setB() // closed
+      .then( CONTROL.POWER.off)
+      .then( CONTROL.PUMP.off)
+      .then( CONTROL.POWER_CHANNEL.setA)
+      .then( CONTROL.VALVE_CHANNEL.setA)
+      .then( CONTROL.DUMP.setB ) // closed
   },
-  PRIME: function(onReady){
-    CONTROL.MASTER.setA(); // open
-    CONTROL.POWER.off();
-    CONTROL.PUMP.off();
-    CONTROL.POWER_CHANNEL.setA();
-    CONTROL.VALVE_CHANNEL.setA();
-    CONTROL.DUMP.setA(); // open
-    setTimeout(function(){
-      CONTROL.DUMP.setB(); // close
-      CONTROL.VALVE_CHANNEL.setB(); // A is full, now fill B
-      setTimeout(function(){
-        CONTROL.VALVE_CHANNEL.setA();
-        onReady();
-      }, 10000);
-    }, 20000);
+  PRIME: function(){
+    return new Promise( (resolve, reject) => {
+      CONTROL.MASTER.setA() // open
+        .then( CONTROL.POWER.off )
+        .then( CONTROL.PUMP.off )
+        .then( CONTROL.POWER_CHANNEL.setA )
+        .then( CONTROL.VALVE_CHANNEL.setA )
+        .then( CONTROL.DUMP.setA ) // open
+        .then( () => {
+          setTimeout( () => {
+            CONTROL.DUMP.setB() // close the dump valve
+              .then( CONTROL.VALVE_CHANNEL.setB ) // A is full, now fill B
+              .then( () => {
+                setTimeout( () => {
+                  CONTROL.VALVE_CHANNEL.setA();
+                  resolve();
+                }, 10000);
+              });
+            }, 20000);
+        });
+    });
   },
-  CHANNEL_A: function(onReady){
-    CONTROL.MASTER.setA(); //open
-    CONTROL.POWER.on();
-    CONTROL.PUMP.on();
-    CONTROL.POWER_CHANNEL.setA();
-    CONTROL.VALVE_CHANNEL.setA();
-    CONTROL.DUMP.setB(); // close
-    setTimeout(function(){
-      CONTROL.POWER.off();
-      CONTROL.DUMP.setA();
-      setTimeout(function(){
-        CONTROL.DUMP.setB();
-        onReady();
-      }, 20 * 1000);
-    }, 1000 * 60 * 20);
+  CHANNEL_A: function(){
+    return new Promise( (resolve, reject) => {
+      CONTROL.MASTER.setA() //open
+        .then( CONTROL.POWER.on )
+        .then( CONTROL.PUMP.on )
+        .then( CONTROL.POWER_CHANNEL.setA )
+        .then( CONTROL.VALVE_CHANNEL.setA )
+        .then( CONTROL.DUMP.setB ) // close
+        .then( () => {
+          setTimeout( () => {
+            CONTROL.POWER.off()
+              .then( CONTROL.DUMP.setA )
+              .then( () => {
+                setTimeout( () => {
+                  CONTROL.DUMP.setB();
+                  resolve();
+                }, 20 * 1000);
+              });
+          }, 1000 * 60 * 20);
+        });
+    });
   },
   CHANNEL_B: function(onReady){
-    CONTROL.MASTER.setA(); //open
-    CONTROL.POWER.on();
-    CONTROL.PUMP.on();
-    CONTROL.POWER_CHANNEL.setB();
-    CONTROL.VALVE_CHANNEL.setB();
-    CONTROL.DUMP.setB(); // close
-    setTimeout(function(){
-      CONTROL.POWER.off();
-      CONTROL.DUMP.setA();
-      setTimeout(function(){
-        CONTROL.DUMP.setB();
-        onReady();
-      }, 20 * 1000);
-    }, 1000 * 60 * 20);
+    return new Promise( (resolve, reject) => {
+      CONTROL.MASTER.setA() //open
+        .then( CONTROL.POWER.on )
+        .then( CONTROL.PUMP.on )
+        .then( CONTROL.POWER_CHANNEL.setB )
+        .then( CONTROL.VALVE_CHANNEL.setB )
+        .then( CONTROL.DUMP.setB ) // close
+        .then( () => {
+          setTimeout( () => {
+            CONTROL.POWER.off()
+              .then( CONTROL.DUMP.setA )
+              .then( () => {
+                setTimeout( () => {
+                  CONTROL.DUMP.setB();
+                  resolve();
+                }, 20 * 1000);
+              });
+          }, 1000 * 60 * 20);
+        });
+    });
   }
 };
 
@@ -118,8 +135,7 @@ function updateEnd(newEnd){
 }
 
 function updateCycle(state){
-  if(state === 0) OVERRIDE_OFF = true;
-  else if(state === 1) OVERRIDE_OFF = false;
+  OVERRIDE_OFF = (state === 0);
 }
 
 //register event listeners
@@ -129,45 +145,66 @@ EddiFire.register('state', updateCycle);
 
 EddiFire.init();
 
-function nextCycle(onReady){
+function nextCycle(){
 
+  var targetCycle;
   switch(currentCycle){
     case CYCLE.OFF:
-      currentCycle = CYCLE.PRIME;
+      targetCycle = CYCLE.PRIME;
       break;
     case CYCLE.PRIME:
-      currentCycle = CYCLE.CHANNEL_A;
+      targetCycle = CYCLE.CHANNEL_A;
       break;
     case CYCLE.CHANNEL_A:
-      currentCycle = CYCLE.CHANNEL_B;
+      targetCycle = CYCLE.CHANNEL_B;
       break;
     case CYCLE.CHANNEL_B:
-      currentCycle = CYCLE.CHANNEL_A;
+      targetCycle = CYCLE.CHANNEL_A;
       break;
   }
 
-  // TODO: Check for start and end time;
-  if(!checkTime()) currentCycle = CYCLE.OFF;
-
+  // Check for start and end time;
+  if(!checkTime()){
+    targetCycle = CYCLE.OFF;
+  }
   //check to see if user asked for it to be turned off
-  if(OVERRIDE_OFF) currentCycle = CYCLE.OFF;
+  if(OVERRIDE_OFF){
+    targetCycle = CYCLE.OFF;
+  }
 
   // Trigger next cycle
-  currentCycle(onReady);
-
-  // TODO: Update firebase
-  EddiFire.alertState(getCycleState(currentCycle));
-
-  // TODO: Report when cycle change happens to socket
+  if( targetCycle !== currentCycle ){
+    return targetCycle.then( () => {
+      currentCycle = targetCycle;
+      return EddiFire.alertState(getCycleState(currentCycle));
+    });
+  } else {
+    return Promise.resolve();
+  }
 }
 
-var locked = false;
-setInterval(function(){
-  if( !locked ){
-    locked = true;
-    nextCycle(function(){
-      locked = false;
-    });
+
+// eternal loop
+function loop(){
+  var locked = false;
+  setInterval(function(){
+    if( !locked ){
+      locked = true;
+      nextCycle().then( () => {
+        locked = false;
+      });
+    }
+  }, 3000);
+  // this pattern prevents tail recursion
+}
+
+
+
+// initialize and run
+var initializePromises = [];
+for( let key in CONTROL ){
+  if( CONTROL.hasOwnProperty(key) ){
+    initializePromises.push( CONTROL[key].initialize() );
   }
-}, 1000);
-// this pattern prevents tail recursion
+}
+Promise.all( initializePromises ).then( loop );
