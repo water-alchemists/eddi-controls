@@ -3,7 +3,7 @@ const fs = require('fs');
 const Pin = require('./Pin');
 const LatchingPinPair = require('./LatchingPinPair');
 const EddiFireStarter = require('./eddi-fire');
-const additions = require('./promise-additions');
+const promiseAdditions = require('./promise-additions');
 
 const EddiFire = EddiFireStarter();
 
@@ -20,61 +20,108 @@ var CONTROL = {
 
 var CYCLE = {
   OFF: function(onReady){
-    CONTROL.MASTER.setB(); // closed
-    CONTROL.POWER.off();
-    CONTROL.PUMP.off();
-    CONTROL.POWER_CHANNEL.setA();
-    CONTROL.VALVE_CHANNEL.setA();
-    CONTROL.DUMP.setB(); // closed
-    onReady();
+    return CONTROL.MASTER.setB() // closed
+      .then(() => CONTROL.POWER.off()) 
+      .then(() => CONTROL.PUMP.off())
+      .then(() => CONTROL.POWER_CHANNEL.setA())
+      .then(() => CONTROL.VALVE_CHANNEL.setA())
+      .then(() => CONTROL.DUMP.setB()) // closed
+      .then(() => onReady());
+
+    // CONTROL.MASTER.setB(); // closed
+    // CONTROL.POWER.off();
+    // CONTROL.PUMP.off();
+    // CONTROL.POWER_CHANNEL.setA();
+    // CONTROL.VALVE_CHANNEL.setA();
+    // CONTROL.DUMP.setB(); // closed
+    // onReady();
   },
   PRIME: function(onReady){
-    CONTROL.MASTER.setA(); // open
-    CONTROL.POWER.off();
-    CONTROL.PUMP.off();
-    CONTROL.POWER_CHANNEL.setA();
-    CONTROL.VALVE_CHANNEL.setA();
-    CONTROL.DUMP.setA(); // open
-    setTimeout(function(){
-      CONTROL.DUMP.setB(); // close
-      CONTROL.VALVE_CHANNEL.setB(); // A is full, now fill B
-      setTimeout(function(){
-        CONTROL.VALVE_CHANNEL.setA();
-        onReady();
-      }, 10000);
-    }, 20000);
+    return CONTROL.MASTER.setA(); // open
+      .then(() => CONTROL.POWER.off())
+      .then(() => CONTROL.PUMP.off())
+      .then(() => CONTROL.POWER_CHANNEL.setA())
+      .then(() => CONTROL.VALVE_CHANNEL.setA())
+      .then(() => CONTROL.DUMP.setA()) // open
+      .then(() => promiseAdditions.delay(20000)) 
+      .then(() => CONTROL.DUMP.setB()) // close
+      .then(() => CONTROL.VALVE_CHANNEL.setB()) // A is full, now fill B
+      .then(() => promiseAdditions.delay(10000))
+      .then(() => CONTROL.VALVE_CHANNEL.setA())
+      .then(() => onReady())
+
+    // CONTROL.MASTER.setA(); // open
+    // CONTROL.POWER.off();
+    // CONTROL.PUMP.off();
+    // CONTROL.POWER_CHANNEL.setA();
+    // CONTROL.VALVE_CHANNEL.setA();
+    // CONTROL.DUMP.setA(); // open
+    // setTimeout(function(){
+    //   CONTROL.DUMP.setB(); // close
+    //   CONTROL.VALVE_CHANNEL.setB(); // A is full, now fill B
+    //   setTimeout(function(){
+    //     CONTROL.VALVE_CHANNEL.setA();
+    //     onReady();
+    //   }, 10000);
+    // }, 20000);
   },
   CHANNEL_A: function(onReady){
-    CONTROL.MASTER.setA(); //open
-    CONTROL.POWER.on();
-    CONTROL.PUMP.on();
-    CONTROL.POWER_CHANNEL.setA();
-    CONTROL.VALVE_CHANNEL.setA();
-    CONTROL.DUMP.setB(); // close
-    setTimeout(function(){
-      CONTROL.POWER.off();
-      CONTROL.DUMP.setA();
-      setTimeout(function(){
-        CONTROL.DUMP.setB();
-        onReady();
-      }, 20 * 1000);
-    }, 1000 * 60 * 20);
+    return  CONTROL.MASTER.setA()
+      .then(() => CONTROL.POWER.on()) //open
+      .then(() => CONTROL.PUMP.on())
+      .then(() => CONTROL.POWER_CHANNEL.setA())
+      .then(() => CONTROL.VALVE_CHANNEL.setA())
+      .then(() => CONTROL.DUMP.setB()) // close
+      .then(() => promiseAdditions.delay(1000 * 60 * 20))
+      .then(() => CONTROL.POWER.off())
+      .then(() => CONTROL.DUMP.setA())
+      .then(() => promiseAdditions.delay(20 * 1000))
+      .then(() => CONTROL.DUMP.setB())
+      .then(() => onReady());
+
+    // CONTROL.MASTER.setA(); //open
+    // CONTROL.POWER.on();
+    // CONTROL.PUMP.on();
+    // CONTROL.POWER_CHANNEL.setA();
+    // CONTROL.VALVE_CHANNEL.setA();
+    // CONTROL.DUMP.setB(); // close
+    // setTimeout(function(){
+    //   CONTROL.POWER.off();
+    //   CONTROL.DUMP.setA();
+    //   setTimeout(function(){
+    //     CONTROL.DUMP.setB();
+    //     onReady();
+    //   }, 20 * 1000);
+    // }, 1000 * 60 * 20);
   },
   CHANNEL_B: function(onReady){
-    CONTROL.MASTER.setA(); //open
-    CONTROL.POWER.on();
-    CONTROL.PUMP.on();
-    CONTROL.POWER_CHANNEL.setB();
-    CONTROL.VALVE_CHANNEL.setB();
-    CONTROL.DUMP.setB(); // close
-    setTimeout(function(){
-      CONTROL.POWER.off();
-      CONTROL.DUMP.setA();
-      setTimeout(function(){
-        CONTROL.DUMP.setB();
-        onReady();
-      }, 20 * 1000);
-    }, 1000 * 60 * 20);
+    return CONTROL.MASTER.setA() //open
+      .then(() => CONTROL.POWER.on())
+      .then(() => CONTROL.PUMP.on())
+      .then(() => CONTROL.POWER_CHANNEL.setB())
+      .then(() => CONTROL.VALVE_CHANNEL.setB())
+      .then(() => CONTROL.DUMP.setB())
+      .then(() => promiseAdditions.delay(1000 * 60 * 20)) // close
+      .then(() => CONTROL.POWER.off())
+      .then(() => CONTROL.DUMP.setA())
+      .then(() => promiseAdditions.delay(20 * 1000))
+      .then(() => CONTROL.DUMP.setB())
+      .then(() => onReady());
+
+    // CONTROL.MASTER.setA(); //open
+    // CONTROL.POWER.on();
+    // CONTROL.PUMP.on();
+    // CONTROL.POWER_CHANNEL.setB();
+    // CONTROL.VALVE_CHANNEL.setB();
+    // CONTROL.DUMP.setB(); // close
+    // setTimeout(function(){
+    //   CONTROL.POWER.off();
+    //   CONTROL.DUMP.setA();
+    //   setTimeout(function(){
+    //     CONTROL.DUMP.setB();
+    //     onReady();
+    //   }, 20 * 1000);
+    // }, 1000 * 60 * 20);
   }
 };
 

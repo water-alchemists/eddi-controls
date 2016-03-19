@@ -20,11 +20,9 @@ LatchingPinPair.prototype._set = function(pin){
     }
 
     return turnOff()
-      .then(() => {
-        return pin.on()
-          .then(() => promiseAdditions.delay(this.timeout))
-          .then(() => pin.off());
-      });
+      .then(() => pin.on())
+      .then(() => promiseAdditions.delay(this.timeout))
+      .then(() => pin.off());
   });
 
   // this.state = (pin === this.pinA);
