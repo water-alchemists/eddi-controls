@@ -10,12 +10,12 @@ const EddiFire = EddiFireStarter();
 // https://docs.google.com/document/d/10JIoueW5nWawstjQoYBl2q0yIJkiKjjHA8fwlIf_kPw/edit
 
 var CONTROL = {
-  MASTER:           new LatchingPinPair(2 , 3 , 200),
+  MASTER:           new LatchingPinPair(12 , 13 , 200),
   POWER:            new Pin(4),
   PUMP:             new Pin(7),
   POWER_CHANNEL:    new LatchingPinPair(8 , 9 , 200),
   VALVE_CHANNEL:    new LatchingPinPair(10, 11, 200),
-  DUMP:             new LatchingPinPair(12, 13, 200),
+  DUMP:             new LatchingPinPair(2, 3, 200),
 };
 
 var CYCLE = {
