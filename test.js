@@ -53,4 +53,4 @@ for( let key in CONTROL ){
   }
 }
 console.log("Initializing Pins...");
-Promise.all( initializePromises ).then( loop );
+Promise.all( initializePromises ).then( test );
