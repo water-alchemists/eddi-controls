@@ -33,8 +33,10 @@ Pin.prototype.initialize = function(){
           console.error(err);
           process.exit(1);
         }
-        this.ready = true;
-        resolve();
+        this.off().then( () => {
+          this.ready = true;
+          resolve();
+        });
       });
     });
   });
