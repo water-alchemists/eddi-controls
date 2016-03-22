@@ -12,28 +12,45 @@ var CONTROL = {
 };
 
 
-try{
-	console.log("Testing Master Circuit");
-	CONTROL.MASTER.setA(); // open
-	setTimeout(function(){
-		CONTROL.MASTER.setB();
-	}, 1000);
 
 
-
-	//CONTROL.POWER.off();
-	//CONTROL.PUMP.off();
-	//CONTROL.POWER_CHANNEL.setA();
-	//CONTROL.VALVE_CHANNEL.setA();
-	//CONTROL.DUMP.setA(); // open
-
-
-	console.log("Tests Done...");
-} catch (err) {
-
-	console.error("Could not complete tests due to error: ");
-	console.error(err);
-
+function test(){
+  console.log("Beginning Test...");
+  return CONTROL.MASTER.setB(); // open
+      .then(() => promiseAdditions.delay(1000));
+      .then(() => CONTROL.MASTER.setA())
+      .then(() => console.log("Master Valve Test Success"))
+      .then(() => CONTROL.POWER.on())
+      .then(() => promiseAdditions.delay(1000));
+      .then(() => CONTROL.POWER.off())
+      .then(() => console.log("High Power Test Success"))
+      .then(() => CONTROL.PUMP.on())
+      .then(() => promiseAdditions.delay(1000));
+      .then(() => CONTROL.PUMP.off())
+      .then(() => console.log("Pump Test Success"))
+      .then(() => CONTROL.POWER_CHANNEL.setB())
+      .then(() => promiseAdditions.delay(1000));
+      .then(() => CONTROL.POWER_CHANNEL.setA())
+      .then(() => console.log("Power Channel Test Success"))
+      .then(() => CONTROL.VALVE_CHANNEL.setB())
+      .then(() => promiseAdditions.delay(1000));
+      .then(() => CONTROL.VALVE_CHANNEL.setA())
+      .then(() => console.log("Valve Channel Test Success"))
+      .then(() => CONTROL.DUMP.setB()) // open
+      .then(() => promiseAdditions.delay(1000));
+      .then(() => CONTROL.DUMP.setA()) // close
+      .then(() => console.log("Dump Valve Test Success"))
+      .then(() => console.log("All Tests Successful!"));
 }
 
 
+
+// initialize and run
+var initializePromises = [];
+for( let key in CONTROL ){
+  if( CONTROL.hasOwnProperty(key) ){
+    initializePromises.push( CONTROL[key].initialize() );
+  }
+}
+console.log("Initializing Pins...");
+Promise.all( initializePromises ).then( loop );
