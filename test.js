@@ -1,5 +1,6 @@
 var Pin = require('./Pin');
-var LatchingPinPair = require('./LatchingPinPair');
+var LatchingPinPair = require('./LatchingPinPair'),
+  promiseAdditions = require('./promise-additions');
 
 
 var CONTROL = {
