@@ -18,8 +18,26 @@ var CONTROL = {
   DUMP:             new LatchingPinPair(2, 3, 200),
 };
 
+const TEST_DELAY = 1000;
+
+const DELAY = {
+  PRIME : {
+    FIRST : 20000,
+    SECOND : 10000
+  },
+  CHANNEL_A : {
+    FIRST : 1000 * 60 * 20,
+    SECOND : 20 * 1000
+  },
+  CHANNEL_B : {
+    FIRST : 1000 * 60 * 20,
+    SECOND : 20 * 1000
+  }
+}
+
 var CYCLE = {
   OFF: function(){
+    console.log('OFF triggered.');
     return CONTROL.MASTER.setB() // closed
       .then(() => CONTROL.POWER.off())
       .then(() => CONTROL.PUMP.off())
@@ -36,16 +54,17 @@ var CYCLE = {
     // onReady();
   },
   PRIME: function(){
+    console.log('PRIME triggered');
     return CONTROL.MASTER.setA() // open
       .then(() => CONTROL.POWER.off())
       .then(() => CONTROL.PUMP.off())
       .then(() => CONTROL.POWER_CHANNEL.setA())
       .then(() => CONTROL.VALVE_CHANNEL.setA())
       .then(() => CONTROL.DUMP.setA()) // open
-      .then(() => promiseAdditions.delay(20000))
+      .then(() => promiseAdditions.delay(DELAY.PRIME.FIRST))
       .then(() => CONTROL.DUMP.setB()) // close
       .then(() => CONTROL.VALVE_CHANNEL.setB()) // A is full, now fill B
-      .then(() => promiseAdditions.delay(10000))
+      .then(() => promiseAdditions.delay(DELAY.PRIME.SECOND))
       .then(() => CONTROL.VALVE_CHANNEL.setA());
 
     // CONTROL.MASTER.setA(); // open
@@ -64,16 +83,18 @@ var CYCLE = {
     // }, 20000);
   },
   CHANNEL_A: function(){
+    console.log('CHANNEL_A triggered');
+
     return  CONTROL.MASTER.setA()
       .then(() => CONTROL.POWER.on()) //open
       .then(() => CONTROL.PUMP.on())
       .then(() => CONTROL.POWER_CHANNEL.setA())
       .then(() => CONTROL.VALVE_CHANNEL.setA())
       .then(() => CONTROL.DUMP.setB()) // close
-      .then(() => promiseAdditions.delay(1000 * 60 * 20))
+      .then(() => promiseAdditions.delay(DELAY.CHANNEL_A.FIRST))
       .then(() => CONTROL.POWER.off())
       .then(() => CONTROL.DUMP.setA())
-      .then(() => promiseAdditions.delay(20 * 1000))
+      .then(() => promiseAdditions.delay(DELAY.CHANNEL_A.SECOND))
       .then(() => CONTROL.DUMP.setB());
 
     // CONTROL.MASTER.setA(); //open
@@ -92,16 +113,18 @@ var CYCLE = {
     // }, 1000 * 60 * 20);
   },
   CHANNEL_B: function(){
+    console.log('CHANNEL_B triggered');
+
     return CONTROL.MASTER.setA() //open
       .then(() => CONTROL.POWER.on())
       .then(() => CONTROL.PUMP.on())
       .then(() => CONTROL.POWER_CHANNEL.setB())
       .then(() => CONTROL.VALVE_CHANNEL.setB())
       .then(() => CONTROL.DUMP.setB())
-      .then(() => promiseAdditions.delay(1000 * 60 * 20)) // close
+      .then(() => promiseAdditions.delay(DELAY.CHANNEL_B.FIRST)) // close
       .then(() => CONTROL.POWER.off())
       .then(() => CONTROL.DUMP.setA())
-      .then(() => promiseAdditions.delay(20 * 1000))
+      .then(() => promiseAdditions.delay(DELAY.CHANNEL_B.SECOND))
       .then(() => CONTROL.DUMP.setB());
 
     // CONTROL.MASTER.setA(); //open
@@ -191,7 +214,7 @@ EddiFire.register('state', updateCycle);
 EddiFire.init();
 
 function nextCycle(){
-  console.log('in next cycle');
+  console.log('evaluating in next cycle');
   var currentCycle = refs.currentCycle,
     targetCycle;
   switch(currentCycle){
@@ -211,21 +234,25 @@ function nextCycle(){
 
   // Check for start and end time;
   if(!checkTime()){
+    console.log('in checked time');
     targetCycle = CYCLE.OFF;
   }
   //check to see if user asked for it to be turned off
   if(refs.OVERRIDE_OFF){
+    console.log('in override off');
     targetCycle = CYCLE.OFF;
   }
 
   // Trigger next cycle
   if( targetCycle !== refs.currentCycle ){
+    console.log('in triggering next cycle');
     return targetCycle()
             .then( () => {
               refs.currentCycle = targetCycle;
               return EddiFire.alertState(getCycleState(targetCycle));
             });
   } else {
+    console.log('in the else');
     return Promise.resolve();
   }
 }
