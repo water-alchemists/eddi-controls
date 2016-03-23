@@ -16,7 +16,7 @@ var CONTROL = {
 
 function test(){
   console.log("Beginning Test...");
-  return CONTROL.MASTER.setB(); // open
+  return CONTROL.MASTER.setB() // open
       .then(() => promiseAdditions.delay(1000))
       .then(() => CONTROL.MASTER.setA())
       .then(() => console.log("Master Valve Test Success"))
