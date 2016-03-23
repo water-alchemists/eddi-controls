@@ -9,9 +9,8 @@ var LatchingPinPair = function(numA, numB, timeout){
 }
 
 LatchingPinPair.prototype.initialize = function(){
-  return Promise.all([this.pinA.initialize, this.pinB.initialize]).then( () => {
-    this.ready = true;
-  });
+  return Promise.all([this.pinA.initialize(), this.pinB.initialize()])
+          .then( () => this.ready = true );
 }
 
 

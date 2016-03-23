@@ -36,7 +36,7 @@ var CYCLE = {
     // onReady();
   },
   PRIME: function(){
-    return CONTROL.MASTER.setA(); // open
+    return CONTROL.MASTER.setA() // open
       .then(() => CONTROL.POWER.off())
       .then(() => CONTROL.PUMP.off())
       .then(() => CONTROL.POWER_CHANNEL.setA())
@@ -121,22 +121,40 @@ var CYCLE = {
   }
 };
 
-var currentCycle = CYCLE.OFF;
-var OVERIDE_OFF = false;
-var start = {
+// OLD
+// var currentCycle = CYCLE.OFF;
+// var OVERIDE_OFF = false;
+// var start = {
+//     hour : 9,
+//     minute : 0
+//   },
+//   end = {
+//     hour : 15,
+//     minute : 0
+//   };
+
+// NEW : put in object so that the event callbacks can update the values
+const refs = {
+  currentCycle : CYCLE.OFF,
+  OVERIDE_OFF : false,
+  start : {
     hour : 9,
     minute : 0
   },
-  end = {
+  end : {
     hour : 15,
     minute : 0
-  };
+  }
+}
 
 function checkTime(){
   //checks to see if the current time is within scheduled time
   const startTime = new Date(),
     endTime = new Date(),
     current = new Date();
+
+  const start = refs.start,
+    end = refs.end;
 
     //set start date
     startTime.setHours(start.hour);
@@ -154,15 +172,15 @@ function getCycleState(search){
 }
 
 function updateStart(newStart){
-  start = newStart;
+  refs.start = Object.assign(refs.start, newStart);
 }
 
 function updateEnd(newEnd){
-  end = newEnd;
+  refs.end = Object.assign(refs.start, newEnd);
 }
 
 function updateCycle(state){
-  OVERRIDE_OFF = (state === 0);
+  refs.OVERRIDE_OFF = (state === 0);
 }
 
 //register event listeners
@@ -173,8 +191,9 @@ EddiFire.register('state', updateCycle);
 EddiFire.init();
 
 function nextCycle(){
-
-  var targetCycle;
+  console.log('in next cycle');
+  var currentCycle = refs.currentCycle,
+    targetCycle;
   switch(currentCycle){
     case CYCLE.OFF:
       targetCycle = CYCLE.PRIME;
@@ -195,16 +214,17 @@ function nextCycle(){
     targetCycle = CYCLE.OFF;
   }
   //check to see if user asked for it to be turned off
-  if(OVERRIDE_OFF){
+  if(refs.OVERRIDE_OFF){
     targetCycle = CYCLE.OFF;
   }
 
   // Trigger next cycle
-  if( targetCycle !== currentCycle ){
-    return targetCycle.then( () => {
-      currentCycle = targetCycle;
-      return EddiFire.alertState(getCycleState(currentCycle));
-    });
+  if( targetCycle !== refs.currentCycle ){
+    return targetCycle()
+            .then( () => {
+              refs.currentCycle = targetCycle;
+              return EddiFire.alertState(getCycleState(targetCycle));
+            });
   } else {
     return Promise.resolve();
   }
@@ -225,13 +245,14 @@ function loop(){
   // this pattern prevents tail recursion
 }
 
-
-
 // initialize and run
-var initializePromises = [];
-for( let key in CONTROL ){
-  if( CONTROL.hasOwnProperty(key) ){
-    initializePromises.push( CONTROL[key].initialize() );
-  }
-}
-Promise.all( initializePromises ).then( loop );
+// var initializePromises = [];
+// for( let key in CONTROL ){
+//   if( CONTROL.hasOwnProperty(key) ){
+//     console.log('pushing', key);
+//     initializePromises.push( CONTROL[key].initialize() );
+//   }
+// }
+const initializePromises = Object.keys(CONTROL).map(key => CONTROL[key].initialize());
+
+Promise.all( initializePromises ).then( () => loop() ).catch(err => console.error(err.stack));

@@ -21,6 +21,8 @@ const EVENTS = {
 
 const EDDI_ID = process.env.EDDI_ID || 'test-teddi';
 
+console.log('this is the id :', EDDI_ID);
+
 class EddiFire {
 	constructor(){
 		const ref = new Firebase(PATHS.BASE),
