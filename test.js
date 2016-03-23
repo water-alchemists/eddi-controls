@@ -43,14 +43,26 @@ function test(){
       .then(() => console.log("All Tests Successful!"));
 }
 
-
-
 // initialize and run
-var initializePromises = [];
-for( let key in CONTROL ){
-  if( CONTROL.hasOwnProperty(key) ){
-    initializePromises.push( CONTROL[key].initialize() );
-  }
-}
+// var initializePromises = [];
+// for( let key in CONTROL ){
+//   if( CONTROL.hasOwnProperty(key) ){
+//     initializePromises.push( CONTROL[key].initialize() );
+//   }
+// }
+
+const controlKeys = Object.keys(CONTROL),
+  initializePromises = controlKeys.map(key => CONTROL[key].initialize());
+
+process.on('SIGINT', (event) => {
+  console.log('Got SIGINT. Cleaning up this process.');
+  const offPromises = controlKeys.map(key => CONTROL[key].off());
+  return Promise.all(offPromises)
+          .then(() => console.log('All pins are turned off.'))
+          .then(() => process.exit());
+});
+
 console.log("Initializing Pins...");
 Promise.all( initializePromises ).then( test );
+
+
