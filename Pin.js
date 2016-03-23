@@ -27,6 +27,7 @@ Pin.prototype.initialize = function(){
   // THE REAL DEAL
   return fsPromises.stats(this.file)
     .catch(() => {
+      console.log('in the catch');
       const exportPath = '/sys/class/gpio/export',
         directionPath = `/sys/class/gpio/gpio${this.num}/direction`,
         exportData = `${this.num}\n`,
@@ -39,7 +40,8 @@ Pin.prototype.initialize = function(){
           throw err;
         })
     })
-    .then(() => {
+    .then(data => {
+      console.log('got the stats', data, 'pin num', this.pin, this.num );
       this.ready = true;
       return this.off();
     });
