@@ -1,4 +1,5 @@
-var fs = require('fs');
+'use strict';
+const fsPromises = require('./fs-promises');
 
 var gpio = {
   2 : 8,
@@ -22,25 +23,47 @@ var Pin = function(pin){
 }
 
 Pin.prototype.initialize = function(){
+  console.log(`${this.pin} initializing with mapping ${this.num}`);
   // THE REAL DEAL
-  return new Promise( (resolve, reject) => {
-    fs.writeFile("/sys/class/gpio/export", this.num+"\n", (err) => {
-      if( err ){
-        console.error(err);
-        process.exit(1);
-        return reject();
-      }
-      fs.writeFile("/sys/class/gpio/gpio"+this.num+"/direction", "out\n", (err) => {
-        if( err ){
+  return fsPromises.stat(this.file)
+    .catch(() => {
+      const exportPath = '/sys/class/gpio/export',
+        directionPath = `/sys/class/gpio/gpio${this.num}/direction`,
+        exportData = `${this.num}\n`,
+        directionData = 'out\n';
+      return fsPromises.writeFile(exportPath, exportData)
+        .then(() => fsPromises.writeFile(directionPath, directionData))
+        .catch(err => {
           console.error(err);
           process.exit(1);
-          return reject();
-        }
-        this.ready = true;
-        return this.off().then(resolve);
-      });
+          throw err;
+        })
+    })
+    .then(() => {
+      this.ready = true;
+      return this.off();
     });
-  });
+
+  // THE ORIGINAL
+  // return new Promise( (resolve, reject) => {
+  //   fs.writeFile("/sys/class/gpio/export", this.num+"\n", (err) => {
+  //     if( err ){
+  //       console.error(err);
+  //       process.exit(1);
+  //       return reject();
+  //     }
+  //     fs.writeFile("/sys/class/gpio/gpio"+this.num+"/direction", "out\n", (err) => {
+  //       if( err ){
+  //         console.error(err);
+  //         process.exit(1);
+  //         return reject();
+  //       }
+  //       this.ready = true;
+  //       return this.off().then(resolve);
+  //     });
+  //   });
+  // });
+
   // FOR TESTING ON LOCAL MACHINE
   // console.log(`${this.pin} initialize with mapping ${this.num}`);
   // this.ready = true

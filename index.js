@@ -256,12 +256,23 @@ function loop(){
 const controlKeys = Object.keys(CONTROL),
   initializePromises = controlKeys.map(key => CONTROL[key].initialize());
 
-process.on('SIGINT', (event) => {
+process.on('SIGINT', () => {
   console.log('Got SIGINT. Cleaning up this process.');
   const offPromises = controlKeys.map(key => CONTROL[key].off());
   return Promise.all(offPromises)
           .then(() => console.log('All pins are turned off.'))
           .then(() => process.exit());
+});
+
+process.on('beforeExit', () => {
+  const offPromises = controlKeys.map(key => CONTROL[key].off());
+  return Promise.all(offPromises)
+          .then(() => console.log('All pins are turned off.'))
+          .then(() => process.exit());
+});
+
+process.on('exit', () => {
+  console.log('process exited');
 });
 
 Promise.all( initializePromises ).then( () => loop() ).catch(err => console.error(err.stack));

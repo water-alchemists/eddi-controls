@@ -62,6 +62,17 @@ process.on('SIGINT', (event) => {
           .then(() => process.exit());
 });
 
+process.on('beforeExit', () => {
+  const offPromises = controlKeys.map(key => CONTROL[key].off());
+  return Promise.all(offPromises)
+          .then(() => console.log('All pins are turned off.'))
+          .then(() => process.exit());
+});
+
+process.on('exit', () => {
+  console.log('process exited');
+});
+
 console.log("Initializing Pins...");
 Promise.all( initializePromises ).then( test );
 
