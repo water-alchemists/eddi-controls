@@ -13,37 +13,37 @@ var CONTROL = {
 };
 
 
-
+const TIME_DELAY = 5000;
 
 function test(){
   console.log("Beginning Test...");
   return CONTROL.MASTER.setB() // open
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.MASTER.setA())
       .then(() => console.log("Master Valve Test Success"))
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.POWER.on())
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.POWER.off())
       .then(() => console.log("High Power Test Success"))
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.PUMP.on())
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.PUMP.off())
       .then(() => console.log("Pump Test Success"))
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.POWER_CHANNEL.setB())
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.POWER_CHANNEL.setA())
       .then(() => console.log("Power Channel Test Success"))
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.VALVE_CHANNEL.setB())
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.VALVE_CHANNEL.setA())
       .then(() => console.log("Valve Channel Test Success"))
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.DUMP.setB()) // open
-      .then(() => promiseAdditions.delay(1000))
+      .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.DUMP.setA()) // close
       .then(() => console.log("Dump Valve Test Success"))
       .then(() => console.log("All Tests Successful!"));
