@@ -17,27 +17,27 @@ var CONTROL = {
 function test(){
   console.log("Beginning Test...");
   return CONTROL.MASTER.setB(); // open
-      .then(() => promiseAdditions.delay(1000));
+      .then(() => promiseAdditions.delay(1000))
       .then(() => CONTROL.MASTER.setA())
       .then(() => console.log("Master Valve Test Success"))
       .then(() => CONTROL.POWER.on())
-      .then(() => promiseAdditions.delay(1000));
+      .then(() => promiseAdditions.delay(1000))
       .then(() => CONTROL.POWER.off())
       .then(() => console.log("High Power Test Success"))
       .then(() => CONTROL.PUMP.on())
-      .then(() => promiseAdditions.delay(1000));
+      .then(() => promiseAdditions.delay(1000))
       .then(() => CONTROL.PUMP.off())
       .then(() => console.log("Pump Test Success"))
       .then(() => CONTROL.POWER_CHANNEL.setB())
-      .then(() => promiseAdditions.delay(1000));
+      .then(() => promiseAdditions.delay(1000))
       .then(() => CONTROL.POWER_CHANNEL.setA())
       .then(() => console.log("Power Channel Test Success"))
       .then(() => CONTROL.VALVE_CHANNEL.setB())
-      .then(() => promiseAdditions.delay(1000));
+      .then(() => promiseAdditions.delay(1000))
       .then(() => CONTROL.VALVE_CHANNEL.setA())
       .then(() => console.log("Valve Channel Test Success"))
       .then(() => CONTROL.DUMP.setB()) // open
-      .then(() => promiseAdditions.delay(1000));
+      .then(() => promiseAdditions.delay(1000))
       .then(() => CONTROL.DUMP.setA()) // close
       .then(() => console.log("Dump Valve Test Success"))
       .then(() => console.log("All Tests Successful!"));
