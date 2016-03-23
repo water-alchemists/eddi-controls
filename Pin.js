@@ -31,14 +31,13 @@ Pin.prototype.initialize = function(){
         return reject();
       }
       fs.writeFile("/sys/class/gpio/gpio"+this.num+"/direction", "out\n", (err) => {
-          if( err ){
-            console.error(err);
-            process.exit(1);
-            return reject();
-          }
-          this.ready = true;
-          return this.off().then(resolve);
-        });
+        if( err ){
+          console.error(err);
+          process.exit(1);
+          return reject();
+        }
+        this.ready = true;
+        return this.off().then(resolve);
       });
     });
   });
