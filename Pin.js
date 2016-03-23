@@ -27,7 +27,6 @@ Pin.prototype.initialize = function(){
   // THE REAL DEAL
   return fsPromises.stat(this.file)
     .catch(err => {
-      console.log('in the catch', err.stack);
       const exportPath = '/sys/class/gpio/export',
         directionPath = `/sys/class/gpio/gpio${this.num}/direction`,
         exportData = `${this.num}\n`,
@@ -41,7 +40,7 @@ Pin.prototype.initialize = function(){
         })
     })
     .then(data => {
-      console.log('got the stats', data, 'pin num', this.pin, this.num );
+      console.log(`${this.pin} mapped to ${this.num} is exported and set to output.`);
       this.ready = true;
       return this.off();
     });
