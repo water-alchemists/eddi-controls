@@ -2,7 +2,7 @@ var Pin = require('./Pin');
 var LatchingPinPair = require('./LatchingPinPair'),
   promiseAdditions = require('./promise-additions');
 
-const TIME_DELAY = 5000;
+const TIME_DELAY = 3000;
 const LATCHING_DELAY = 500;
 
 var CONTROL = {
