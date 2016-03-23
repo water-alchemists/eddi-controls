@@ -26,8 +26,8 @@ Pin.prototype.initialize = function(){
   console.log(`${this.pin} initializing with mapping ${this.num}`);
   // THE REAL DEAL
   return fsPromises.stats(this.file)
-    .catch(() => {
-      console.log('in the catch');
+    .catch(err => {
+      console.log('in the catch', err.stack);
       const exportPath = '/sys/class/gpio/export',
         directionPath = `/sys/class/gpio/gpio${this.num}/direction`,
         exportData = `${this.num}\n`,
