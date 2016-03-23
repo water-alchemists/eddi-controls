@@ -50,7 +50,7 @@ Pin.prototype.initialize = function(){
 
 Pin.prototype._set = function(val){
   this.state = val;
-  console.log("Writing to pin "+this.pin+", value: "+val);
+  console.log(`Writing to pin ${this.pin}, mapped to ${this.num}, value: ${val}`);
   // THE REAL DEAL
   return new Promise((resolve, reject) => {
     if( !this.ready ){
