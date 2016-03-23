@@ -196,10 +196,14 @@ function getCycleState(search){
 
 function updateStart(newStart){
   refs.start = Object.assign(refs.start, newStart);
+  console.log('this is the new start');
+  console.log(refs.start);
 }
 
 function updateEnd(newEnd){
-  refs.end = Object.assign(refs.start, newEnd);
+  refs.end = Object.assign(refs.end, newEnd);
+  console.log('this is the new end');
+  console.log(refs.end);
 }
 
 function updateCycle(state){
