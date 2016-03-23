@@ -81,7 +81,7 @@ Pin.prototype._set = function(val){
     if( !this.ready ){
       reject( new Error("You must initialize a Pin before using it") );
     }
-    fs.writeFile(this.file, val+"\n", function(err){
+    fs.writeFile(this.file, val+"\n", err => {
       if( err ){
         console.error(err);
         return reject(err);
