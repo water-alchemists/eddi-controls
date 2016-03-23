@@ -1,5 +1,6 @@
 'use strict';
-const fsPromises = require('./fs-promises');
+const fsPromises = require('./fs-promises'),
+  fs = require('fs');
 
 var gpio = {
   2 : 8,

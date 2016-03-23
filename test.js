@@ -75,5 +75,3 @@ process.on('exit', () => {
 
 console.log("Initializing Pins...");
 Promise.all( initializePromises ).then( test ).catch(err => console.error(err.stack));
-
-setInterval(() => 3000);
