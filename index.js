@@ -253,6 +253,15 @@ function loop(){
 //     initializePromises.push( CONTROL[key].initialize() );
 //   }
 // }
-const initializePromises = Object.keys(CONTROL).map(key => CONTROL[key].initialize());
+const controlKeys = Object.keys(CONTROL),
+  initializePromises = controlKeys.map(key => CONTROL[key].initialize());
+
+process.on('SIGINT', (event) => {
+  console.log('Got SIGINT. Cleaning up this process.');
+  const offPromises = controlKeys.map(key => CONTROL[key].off());
+  return Promise.all(offPromises)
+          .then(() => console.log('All pins are turned off.'))
+          .then(() => process.exit());
+});
 
 Promise.all( initializePromises ).then( () => loop() ).catch(err => console.error(err.stack));
