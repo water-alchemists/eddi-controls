@@ -85,6 +85,7 @@ Pin.prototype._set = function(val){
         console.error(err);
         return reject(err);
       }
+      console.log(`Write success to pin ${this.pin}, mapped ${this.num}`)
       resolve();
     });
   });
