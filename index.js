@@ -279,6 +279,7 @@ function nextCycle(){
 function loop(){
   var locked = false;
   setInterval(function(){
+    console.log('set interval run');
     if( !locked ){
       locked = true;
       nextCycle().then( () => {
