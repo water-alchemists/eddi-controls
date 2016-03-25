@@ -18,19 +18,19 @@ var CONTROL = {
   DUMP:             new LatchingPinPair(2, 3, 200),
 };
 
-const TEST_DELAY = 1000;
+const TEST_DELAY = 1000 * 60;
 
 const DELAY = {
   PRIME : {
-    FIRST : 20000,
+    FIRST :  20000,
     SECOND : 10000
   },
   CHANNEL_A : {
-    FIRST : 1000 * 60 * 20,
+    FIRST : TEST_DELAY || 1000 * 60 * 20,
     SECOND : 20 * 1000
   },
   CHANNEL_B : {
-    FIRST : 1000 * 60 * 20,
+    FIRST : TEST_DELAY || 1000 * 60 * 20,
     SECOND : 20 * 1000
   }
 }
@@ -56,16 +56,28 @@ var CYCLE = {
   PRIME: function(){
     console.log('PRIME triggered');
     return CONTROL.MASTER.setA() // open
+      .then(() => console.log('MASTER setA'))
       .then(() => CONTROL.POWER.off())
+      .then(() => console.log('POWER off'))
       .then(() => CONTROL.PUMP.off())
+      .then(() => console.log('PUMP off'))
       .then(() => CONTROL.POWER_CHANNEL.setA())
+      .then(() => console.log('POWER setA'))
       .then(() => CONTROL.VALVE_CHANNEL.setA())
+      .then(() => console.log('VALVE setA'))
       .then(() => CONTROL.DUMP.setA()) // open
+      .then(() => console.log('DUMP setA'))
       .then(() => promiseAdditions.delay(DELAY.PRIME.FIRST))
+      .then(() => console.log('DELAY first ended'))
       .then(() => CONTROL.DUMP.setB()) // close
+      .then(() => console.log('DUMP setB'))
       .then(() => CONTROL.VALVE_CHANNEL.setB()) // A is full, now fill B
+      .then(() => console.log('VALVE setB'))
       .then(() => promiseAdditions.delay(DELAY.PRIME.SECOND))
-      .then(() => CONTROL.VALVE_CHANNEL.setA());
+      .then(() => console.log('DELAY second ended'))
+      .then(() => CONTROL.VALVE_CHANNEL.setA())
+      .then(() => console.log('VALVE setA'));
+
 
     // CONTROL.MASTER.setA(); // open
     // CONTROL.POWER.off();
@@ -86,6 +98,7 @@ var CYCLE = {
     console.log('CHANNEL_A triggered');
 
     return  CONTROL.MASTER.setA()
+      .then(() => console.log('MASTER setA'))
       .then(() => CONTROL.POWER.on()) //open
       .then(() => CONTROL.PUMP.on())
       .then(() => CONTROL.POWER_CHANNEL.setA())
