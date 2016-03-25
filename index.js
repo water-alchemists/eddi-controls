@@ -18,7 +18,8 @@ var CONTROL = {
   DUMP:             new LatchingPinPair(2, 3, 200),
 };
 
-const TEST_DELAY = 1000 * 60;
+const TEST_DELAY = 1000 * 60,
+  STEPS_DELAY = 200;
 
 const DELAY = {
   PRIME : {
@@ -35,15 +36,32 @@ const DELAY = {
   }
 }
 
+function createStepDelay(){
+  return promiseAdditions.delay(STEPS_DELAY);
+}
+
 var CYCLE = {
   OFF: function(){
     console.log('OFF triggered.');
     return CONTROL.MASTER.setB() // closed
+      .then(() => console.log('MASTER setB'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.POWER.off())
+      .then(() => console.log('POWER off'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.off())
+      .then(() => console.log('PUMP off'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.POWER_CHANNEL.setA())
+      .then(() => console.log('POWER setA'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.VALVE_CHANNEL.setA())
-      .then(() => CONTROL.DUMP.setB()); // closed
+      .then(() => console.log('VALVE setA'))
+      .then(() => createStepDelay())
+      .then(() => CONTROL.DUMP.setB()) // closed
+      .then(() => console.log('DUMP setB'))
+      .then(() => createStepDelay())
+      .then(() => console.log('OFF ended'));
 
     // CONTROL.MASTER.setB(); // closed
     // CONTROL.POWER.off();
@@ -57,26 +75,35 @@ var CYCLE = {
     console.log('PRIME triggered');
     return CONTROL.MASTER.setA() // open
       .then(() => console.log('MASTER setA'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.POWER.off())
       .then(() => console.log('POWER off'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.off())
       .then(() => console.log('PUMP off'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.POWER_CHANNEL.setA())
       .then(() => console.log('POWER setA'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.VALVE_CHANNEL.setA())
       .then(() => console.log('VALVE setA'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setA()) // open
       .then(() => console.log('DUMP setA'))
       .then(() => promiseAdditions.delay(DELAY.PRIME.FIRST))
-      .then(() => console.log('DELAY first ended'))
+      .then(() => console.log('DELAY first ended:', DELAY.PRIME.FIRST, 'ms'))
       .then(() => CONTROL.DUMP.setB()) // close
       .then(() => console.log('DUMP setB'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.VALVE_CHANNEL.setB()) // A is full, now fill B
       .then(() => console.log('VALVE setB'))
+      .then(() => createStepDelay())
       .then(() => promiseAdditions.delay(DELAY.PRIME.SECOND))
-      .then(() => console.log('DELAY second ended'))
+      .then(() => console.log('DELAY second ended:', DELAY.PRIME.SECOND, 'ms'))
       .then(() => CONTROL.VALVE_CHANNEL.setA())
-      .then(() => console.log('VALVE setA'));
+      .then(() => console.log('VALVE setA'))
+      .then(() => createStepDelay())
+      .then(() => console.log('PRIME ended'));
 
 
     // CONTROL.MASTER.setA(); // open
@@ -99,26 +126,35 @@ var CYCLE = {
 
     return  CONTROL.MASTER.setA()
       .then(() => console.log('MASTER setA'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.POWER.on()) //open
       .then(() => console.log('POWER on'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.on())
       .then(() => console.log('PUMP on'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.POWER_CHANNEL.setA())
       .then(() => console.log('POWER setA'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.VALVE_CHANNEL.setA())
       .then(() => console.log('VALVE setA'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setB()) // close
       .then(() => console.log('DUMP setB'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_A.FIRST))
-      .then(() => console.log('DELAY first ended'))
+      .then(() => console.log('DELAY first ended:', DELAY.CHANNEL_A.FIRST, 'ms'))
       .then(() => CONTROL.POWER.off())
       .then(() => console.log('POWER off'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setA())
       .then(() => console.log('DUMP setA'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_A.SECOND))
-      .then(() => console.log('DELAY second ended'))
+      .then(() => console.log('DELAY second ended:', DELAY.CHANNEL_A.SECOND, 'ms'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setB())
-      .then(() => console.log('DUMP setB'));
+      .then(() => console.log('DUMP setB'))
+      .then(() => createStepDelay())
+      .then(() => console.log('CHANNEL_A ended'));
 
     // CONTROL.MASTER.setA(); //open
     // CONTROL.POWER.on();
@@ -139,27 +175,36 @@ var CYCLE = {
     console.log('CHANNEL_B triggered');
 
     return CONTROL.MASTER.setA() //open
+      .then(() => createStepDelay())
       .then(() => console.log('MASTER setA'))
       .then(() => CONTROL.POWER.on())
       .then(() => console.log('POWER on'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.on())
       .then(() => console.log('PUMP on'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.POWER_CHANNEL.setB())
       .then(() => console.log('POWER setB'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.VALVE_CHANNEL.setB())
       .then(() => console.log('VALVE setB'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setB())
       .then(() => console.log('DUMP setB'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_B.FIRST)) // close
-      .then(() => console.log('DELAY first ended'))
+      .then(() => console.log('DELAY first ended:', DELAY.CHANNEL_B.FIRST, 'ms'))
       .then(() => CONTROL.POWER.off())
       .then(() => console.log('POWER off'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setA())
       .then(() => console.log('DUMP setA'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_B.SECOND))
-      .then(() => console.log('DELAY second ended'))
+      .then(() => console.log('DELAY second ended:', DELAY.CHANNEL_B.SECOND, 'ms'))
+      .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setB())
-      .then(() => console.log('DUMP setB'));
+      .then(() => console.log('DUMP setB'))
+      .then(() => createStepDelay())
+      .then(() => console.log('CHANNEL_B ended'));
 
     // CONTROL.MASTER.setA(); //open
     // CONTROL.POWER.on();
@@ -271,10 +316,10 @@ function nextCycle(){
   }
 
   // Check for start and end time;
-  if(!checkTime()){
-    console.log('in checked time');
-    targetCycle = CYCLE.OFF;
-  }
+  // if(!checkTime()){
+  //   console.log('in checked time');
+  //   targetCycle = CYCLE.OFF;
+  // }
   //check to see if user asked for it to be turned off
   if(refs.OVERRIDE_OFF){
     console.log('in override off');
@@ -300,7 +345,7 @@ function nextCycle(){
 function loop(){
   var locked = false;
   setInterval(function(){
-    console.log('set interval run', locked);
+    console.log('set interval. locked state:', locked);
     if( !locked ){
       locked = true;
       nextCycle().then( () => {
@@ -320,20 +365,24 @@ function loop(){
 //   }
 // }
 const controlKeys = Object.keys(CONTROL),
-  initializePromises = controlKeys.map(key => CONTROL[key].initialize());
+  initializePromises = controlKeys.map( key => CONTROL[key].initialize() );
 
 process.on('SIGINT', () => {
   console.log('Got SIGINT. Cleaning up this process.');
-  const offPromises = controlKeys.map(key => CONTROL[key].off());
+  const offPromises = controlKeys.map( key => CONTROL[key].off() );
   return Promise.all(offPromises)
           .then(() => console.log('All pins are turned off.'))
+          .then(() => EddiFire.exit())
+          .then(() => console.log('EddiFire removed all event listeners.'))
           .then(() => process.exit());
 });
 
 process.on('beforeExit', () => {
-  const offPromises = controlKeys.map(key => CONTROL[key].off());
+  const offPromises = controlKeys.map( key => CONTROL[key].off() );
   return Promise.all(offPromises)
           .then(() => console.log('All pins are turned off.'))
+          .then(() => EddiFire.exit())
+          .then(() => console.log('EddiFire removed all event listeners.'))
           .then(() => process.exit());
 });
 

@@ -5,7 +5,7 @@ const Pin = require("./Pin"),
 var LatchingPinPair = function(numA, numB, timeout){
   this.pinA = new Pin(numA);
   this.pinB = new Pin(numB);
-  this.timeout = timeout || 200;
+  this.timeout = timeout || 400;
 }
 
 LatchingPinPair.prototype.initialize = function(){

@@ -29,6 +29,7 @@ class EddiFire {
 			EDDI = ref.child(PATHS.EDDI).child(EDDI_ID);
 
 		this.refs = {
+			EDDI : EDDI,
 			[EVENTS.state] : EDDI.child(PATHS.SETTINGS).child(PATHS.STATE),
 			[EVENTS.start] : EDDI.child(PATHS.SETTINGS).child(PATHS.TIMING).child(PATHS.START),
 			[EVENTS.end] : EDDI.child(PATHS.SETTINGS).child(PATHS.TIMING).child(PATHS.END)
@@ -117,11 +118,11 @@ class EddiFire {
 		newState = mapping[stateText],
 		update = {
 			state : newState,
-			updated : new Date().getTime()
+			updated : Math.floor(new Date().getTime() / 1000)
 		};
 
 		return new Promise((resolve, reject) => {
-			this.refs[EVENTS.state]
+			this.refs.EDDI.child(EVENTS.state)
 			.set(update, err => {
 				if(err) return reject(err);
 				console.log(`EddiFire alerted of state change to : ${newState}`);
