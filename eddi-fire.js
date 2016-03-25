@@ -117,12 +117,11 @@ class EddiFire {
 		newState = mapping[stateText],
 		update = {
 			state : newState,
-			updated : new Date.getTime()
+			updated : new Date().getTime()
 		};
 
 		return new Promise((resolve, reject) => {
-			this.EDDI
-			.child(PATHS.STATE)
+			this.refs[EVENTS.state]
 			.set(update, err => {
 				if(err) return reject(err);
 				console.log(`EddiFire alerted of state change to : ${newState}`);

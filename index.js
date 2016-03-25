@@ -100,15 +100,25 @@ var CYCLE = {
     return  CONTROL.MASTER.setA()
       .then(() => console.log('MASTER setA'))
       .then(() => CONTROL.POWER.on()) //open
+      .then(() => console.log('POWER on'))
       .then(() => CONTROL.PUMP.on())
+      .then(() => console.log('PUMP on'))
       .then(() => CONTROL.POWER_CHANNEL.setA())
+      .then(() => console.log('POWER setA'))
       .then(() => CONTROL.VALVE_CHANNEL.setA())
+      .then(() => console.log('VALVE setA'))
       .then(() => CONTROL.DUMP.setB()) // close
+      .then(() => console.log('DUMP setB'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_A.FIRST))
+      .then(() => console.log('DELAY first ended'))
       .then(() => CONTROL.POWER.off())
+      .then(() => console.log('POWER off'))
       .then(() => CONTROL.DUMP.setA())
+      .then(() => console.log('DUMP setA'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_A.SECOND))
-      .then(() => CONTROL.DUMP.setB());
+      .then(() => console.log('DELAY second ended'))
+      .then(() => CONTROL.DUMP.setB())
+      .then(() => console.log('DUMP setB'));
 
     // CONTROL.MASTER.setA(); //open
     // CONTROL.POWER.on();
@@ -129,16 +139,27 @@ var CYCLE = {
     console.log('CHANNEL_B triggered');
 
     return CONTROL.MASTER.setA() //open
+      .then(() => console.log('MASTER setA'))
       .then(() => CONTROL.POWER.on())
+      .then(() => console.log('POWER on'))
       .then(() => CONTROL.PUMP.on())
+      .then(() => console.log('PUMP on'))
       .then(() => CONTROL.POWER_CHANNEL.setB())
+      .then(() => console.log('POWER setB'))
       .then(() => CONTROL.VALVE_CHANNEL.setB())
+      .then(() => console.log('VALVE setB'))
       .then(() => CONTROL.DUMP.setB())
+      .then(() => console.log('DUMP setB'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_B.FIRST)) // close
+      .then(() => console.log('DELAY first ended'))
       .then(() => CONTROL.POWER.off())
+      .then(() => console.log('POWER off'))
       .then(() => CONTROL.DUMP.setA())
+      .then(() => console.log('DUMP setA'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_B.SECOND))
-      .then(() => CONTROL.DUMP.setB());
+      .then(() => console.log('DELAY second ended'))
+      .then(() => CONTROL.DUMP.setB())
+      .then(() => console.log('DUMP setB'));
 
     // CONTROL.MASTER.setA(); //open
     // CONTROL.POWER.on();
@@ -279,12 +300,12 @@ function nextCycle(){
 function loop(){
   var locked = false;
   setInterval(function(){
-    console.log('set interval run');
+    console.log('set interval run', locked);
     if( !locked ){
       locked = true;
       nextCycle().then( () => {
         locked = false;
-      });
+      }).catch(e => console.error(e.stack));
     }
   }, 3000);
   // this pattern prevents tail recursion
