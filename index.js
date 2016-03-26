@@ -316,10 +316,10 @@ function nextCycle(){
   }
 
   // Check for start and end time;
-  // if(!checkTime()){
-  //   console.log('in checked time');
-  //   targetCycle = CYCLE.OFF;
-  // }
+  if(!checkTime()){
+    console.log('in checked time');
+    targetCycle = CYCLE.OFF;
+  }
   //check to see if user asked for it to be turned off
   if(refs.OVERRIDE_OFF){
     console.log('in override off');
