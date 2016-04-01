@@ -43,11 +43,11 @@ function createStepDelay(){
 var CYCLE = {
   OFF: function(){
     console.log('OFF triggered.');
-    return CONTROL.MASTER.setB() // closed
-      .then(() => console.log('MASTER setB'))
-      .then(() => createStepDelay())
-      .then(() => CONTROL.POWER.off())
+    return  CONTROL.POWER.off()
       .then(() => console.log('POWER off'))
+      .then(() => createStepDelay())
+      .then(() => CONTROL.MASTER.setB()) // closed
+      .then(() => console.log('MASTER setB'))
       .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.off())
       .then(() => console.log('PUMP off'))
@@ -73,11 +73,11 @@ var CYCLE = {
   },
   PRIME: function(){
     console.log('PRIME triggered');
-    return CONTROL.MASTER.setA() // open
-      .then(() => console.log('MASTER setA'))
-      .then(() => createStepDelay())
-      .then(() => CONTROL.POWER.off())
+    return CONTROL.POWER.off()
       .then(() => console.log('POWER off'))
+      .then(() => createStepDelay())
+      .then(() => CONTROL.MASTER.setA()) // open
+      .then(() => console.log('MASTER setA'))
       .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.off())
       .then(() => console.log('PUMP off'))
@@ -124,11 +124,11 @@ var CYCLE = {
   CHANNEL_A: function(){
     console.log('CHANNEL_A triggered');
 
-    return  CONTROL.MASTER.setA()
-      .then(() => console.log('MASTER setA'))
+    return  CONTROL.POWER.off()
+      .then(() => console.log('POWER off'))
       .then(() => createStepDelay())
-      .then(() => CONTROL.POWER.on()) //open
-      .then(() => console.log('POWER on'))
+      .then(() => CONTROL.MASTER.setA())
+      .then(() => console.log('MASTER setA'))
       .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.on())
       .then(() => console.log('PUMP on'))
@@ -141,6 +141,9 @@ var CYCLE = {
       .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setB()) // close
       .then(() => console.log('DUMP setB'))
+      .then(() => createStepDelay())
+      .then(() => CONTROL.POWER.on()) //open
+      .then(() => console.log('POWER on'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_A.FIRST))
       .then(() => console.log('DELAY first ended:', DELAY.CHANNEL_A.FIRST, 'ms'))
       .then(() => CONTROL.POWER.off())
@@ -174,11 +177,11 @@ var CYCLE = {
   CHANNEL_B: function(){
     console.log('CHANNEL_B triggered');
 
-    return CONTROL.MASTER.setA() //open
+    return CONTROL.POWER.off())
+      .then(() => console.log('POWER off'))
       .then(() => createStepDelay())
+      .then(() => CONTROL.MASTER.setA()) //open
       .then(() => console.log('MASTER setA'))
-      .then(() => CONTROL.POWER.on())
-      .then(() => console.log('POWER on'))
       .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.on())
       .then(() => console.log('PUMP on'))
@@ -191,6 +194,9 @@ var CYCLE = {
       .then(() => createStepDelay())
       .then(() => CONTROL.DUMP.setB())
       .then(() => console.log('DUMP setB'))
+      .then(() => createStepDelay())
+      .then(() => CONTROL.POWER.on())
+      .then(() => console.log('POWER on'))
       .then(() => promiseAdditions.delay(DELAY.CHANNEL_B.FIRST)) // close
       .then(() => console.log('DELAY first ended:', DELAY.CHANNEL_B.FIRST, 'ms'))
       .then(() => CONTROL.POWER.off())
