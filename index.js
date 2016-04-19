@@ -175,9 +175,8 @@ var CYCLE = {
     // }, 1000 * 60 * 20);
   },
   CHANNEL_B: function(){
-    console.log('CHANNEL_B triggered');
-
-    return CONTROL.POWER.off())
+    	console.log('CHANNEL_B triggered');
+	return CONTROL.POWER.off()
       .then(() => console.log('POWER off'))
       .then(() => createStepDelay())
       .then(() => CONTROL.MASTER.setA()) //open
