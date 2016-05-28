@@ -2,8 +2,8 @@
 const fs = require('fs');
 const Pin = require('./Pin');
 const LatchingPinPair = require('./LatchingPinPair');
-const EddiFireStarter = require('./eddi-fire');
-const promiseAdditions = require('./promise-additions');
+const EddiFireStarter = require('./modules/eddi-fire');
+const promiseAdditions = require('./modules/promise-additions');
 
 const EddiFire = EddiFireStarter();
 

@@ -1,6 +1,6 @@
 'use strict';
 const Pin = require("./Pin"),
-  promiseAdditions = require('./promise-additions');
+  promiseAdditions = require('./modules/promise-additions');
 
 var LatchingPinPair = function(numA, numB, timeout){
   this.pinA = new Pin(numA);
