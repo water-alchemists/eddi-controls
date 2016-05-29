@@ -10,13 +10,17 @@ const PATHS = {
 	START : 'start',
 	END : 'end',
 	HOUR : 'hour',
-	MINUTE : 'minute'
+	MINUTE : 'minute',
+	SALINITY : 'salinity',
+	READINGS : 'readings'
 };
 
 const EVENTS = {
 	start : 'start',
 	end : 'end', 
-	state : 'state'
+	state : 'state',
+	threshold : 'threshold',
+	readings : 'readings'
 };
 
 const EDDI_ID = process.env.EDDI_ID || 'test-teddi';
@@ -32,19 +36,25 @@ class EddiFire {
 			EDDI : EDDI,
 			[EVENTS.state] : EDDI.child(PATHS.SETTINGS).child(PATHS.STATE),
 			[EVENTS.start] : EDDI.child(PATHS.SETTINGS).child(PATHS.TIMING).child(PATHS.START),
-			[EVENTS.end] : EDDI.child(PATHS.SETTINGS).child(PATHS.TIMING).child(PATHS.END)
+			[EVENTS.end] : EDDI.child(PATHS.SETTINGS).child(PATHS.TIMING).child(PATHS.END),
+			[EVENTS.threshold] : EDDI.child(PATHS.SETTINGS).child(PATHS.SALINITY),
+			[EVENTS.readings] : EDDI.child(PATHS.SETTINGS).child(PATHS.READINGS)
 		}
 
 		this.subscribers = {
 			[EVENTS.start] : [],
 			[EVENTS.end] : [],
-			[EVENTS.state] : []
+			[EVENTS.state] : [],
+			[EVENTS.threshold] : [],
+			[EVENTS.readings] : []
 		};
 
 		//these will be updated as values come in from firebase
 		this.state = null;
 		this.start = null;
 		this.end = null;
+		this.threshold = null;
+		this.current = null;
 	}
 
 	init(){
@@ -89,6 +99,36 @@ class EddiFire {
 
 				//lets the subscribers know
 				this.subscribers[EVENTS.end].forEach(func => func(data));
+			});
+			
+		//alert all functions listening to the change of the salinity threshold
+		this.refs[EVENTS.threshold]
+			.on('value', snapshot => {
+				//get and parse value
+				const data = snapshot.val();
+
+				console.log(`EddiFire alerting of salinity threshold change : ${data}`);
+
+				//updates the value from firebase for referencing later
+				this.threshold = data;
+
+				//lets the subscribers know
+				this.subscribers[EVENTS.threshold].forEach(func => func(data));
+			});
+			
+		//alert all functions listening to the change of the current reading
+		this.refs[EVENTS.readings]
+			.on('child_added', snapshot => {
+				//get and parse value
+				const data = snapshot.val();
+
+				console.log(`EddiFire alerting of new reading : ${data}`);
+
+				//updates the value from firebase for referencing later
+				this.current = data;
+
+				//lets the subscribers know
+				this.subscribers[EVENTS.readings].forEach(func => func(data));
 			});
 
 	}
