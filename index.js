@@ -9,9 +9,28 @@ const promiseAdditions = require('./modules/promise-additions'),
 
 // https://docs.google.com/document/d/10JIoueW5nWawstjQoYBl2q0yIJkiKjjHA8fwlIf_kPw/edit
 
+const TEST_DELAY = 1000 * 60,
+  STEPS_DELAY = 200,
+  LATCHING_DELAY = 200;
+
+const DELAY = {
+  PRIME : {
+    FIRST :  20000,
+    SECOND : 10000
+  },
+  CHANNEL_A : {
+    FIRST : TEST_DELAY || 1000 * 60 * 20,
+    SECOND : 20 * 1000
+  },
+  CHANNEL_B : {
+    FIRST : TEST_DELAY || 1000 * 60 * 20,
+    SECOND : 20 * 1000
+  }
+}
+
 // NEW
 var CONTROL = {
-  MASTER_SWTCH :    new Pin(4),   // Switch to control the rest of the circuit
+  MASTER_SWITCH :   new Pin(4),   // Switch to control the rest of the circuit
   VALVE_CHANNEL:    new LatchingPinPair(2, 3, LATCHING_DELAY),    // Recirculation Valves - Controls the direction of the water
   DUMP:             new LatchingPinPair(8, 9, LATCHING_DELAY),    // Dump Valve
   POWER_CHANNEL:    new LatchingPinPair(10 , 11, LATCHING_DELAY), // EDR charges the water
@@ -29,24 +48,6 @@ var CONTROL = {
 //   DUMP:             new LatchingPinPair(2, 3, 200),
 // };
 
-const TEST_DELAY = 1000 * 60,
-  STEPS_DELAY = 200;
-
-const DELAY = {
-  PRIME : {
-    FIRST :  20000,
-    SECOND : 10000
-  },
-  CHANNEL_A : {
-    FIRST : TEST_DELAY || 1000 * 60 * 20,
-    SECOND : 20 * 1000
-  },
-  CHANNEL_B : {
-    FIRST : TEST_DELAY || 1000 * 60 * 20,
-    SECOND : 20 * 1000
-  }
-}
-
 function createStepDelay(){
   return promiseAdditions.delay(STEPS_DELAY);
 }
@@ -57,9 +58,9 @@ var CYCLE = {
     return  CONTROL.POWER.off()
       .then(() => console.log('POWER off'))
       .then(() => createStepDelay())
-      .then(() => CONTROL.MASTER.setB()) // closed
-      .then(() => console.log('MASTER setB'))
-      .then(() => createStepDelay())
+      // .then(() => CONTROL.MASTER.setB()) // closed
+      // .then(() => console.log('MASTER setB'))
+      // .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.off())
       .then(() => console.log('PUMP off'))
       .then(() => createStepDelay())
@@ -87,9 +88,9 @@ var CYCLE = {
     return CONTROL.POWER.off()
       .then(() => console.log('POWER off'))
       .then(() => createStepDelay())
-      .then(() => CONTROL.MASTER.setA()) // open
-      .then(() => console.log('MASTER setA'))
-      .then(() => createStepDelay())
+      // .then(() => CONTROL.MASTER.setA()) // open
+      // .then(() => console.log('MASTER setA'))
+      // .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.off())
       .then(() => console.log('PUMP off'))
       .then(() => createStepDelay())
@@ -138,9 +139,9 @@ var CYCLE = {
     return  CONTROL.POWER.off()
       .then(() => console.log('POWER off'))
       .then(() => createStepDelay())
-      .then(() => CONTROL.MASTER.setA())
-      .then(() => console.log('MASTER setA'))
-      .then(() => createStepDelay())
+      // .then(() => CONTROL.MASTER.setA())
+      // .then(() => console.log('MASTER setA'))
+      // .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.on())
       .then(() => console.log('PUMP on'))
       .then(() => createStepDelay())
@@ -190,9 +191,9 @@ var CYCLE = {
 	return CONTROL.POWER.off()
       .then(() => console.log('POWER off'))
       .then(() => createStepDelay())
-      .then(() => CONTROL.MASTER.setA()) //open
-      .then(() => console.log('MASTER setA'))
-      .then(() => createStepDelay())
+      // .then(() => CONTROL.MASTER.setA()) //open
+      // .then(() => console.log('MASTER setA'))
+      // .then(() => createStepDelay())
       .then(() => CONTROL.PUMP.on())
       .then(() => console.log('PUMP on'))
       .then(() => createStepDelay())
