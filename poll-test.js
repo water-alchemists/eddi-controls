@@ -6,7 +6,7 @@ const UrlPoller = require('./modules/url-poller'),
 const POLL_URL = `${config.homeUrl}/${config.id}`, 
     pollerConfig = {
         url : POLL_URL,
-        interval : 30 * 1000
+        interval : 1000
     },
     INTERVAL = 500;
 

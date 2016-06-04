@@ -5,7 +5,7 @@ const LatchingPinPair = require('./LatchingPinPair');
 const promiseAdditions = require('./modules/promise-additions'),
   config = require('./config'),
   tasks = require('./modules/tasks'),
-  UrlPoller = require('./url-poller');
+  UrlPoller = require('./modules/url-poller');
 
 // https://docs.google.com/document/d/10JIoueW5nWawstjQoYBl2q0yIJkiKjjHA8fwlIf_kPw/edit
 
