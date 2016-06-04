@@ -9,14 +9,25 @@ const EddiFire = EddiFireStarter();
 
 // https://docs.google.com/document/d/10JIoueW5nWawstjQoYBl2q0yIJkiKjjHA8fwlIf_kPw/edit
 
+// NEW
 var CONTROL = {
-  MASTER:           new LatchingPinPair(12 , 13 , 200),
-  POWER:            new Pin(4),
-  PUMP:             new Pin(7),
-  POWER_CHANNEL:    new LatchingPinPair(8 , 9 , 200),
-  VALVE_CHANNEL:    new LatchingPinPair(10, 11, 200),
-  DUMP:             new LatchingPinPair(2, 3, 200),
+  MASTER_SWTCH :    new Pin(4),   // Switch to control the rest of the circuit
+  VALVE_CHANNEL:    new LatchingPinPair(2, 3, LATCHING_DELAY),    // Recirculation Valves - Controls the direction of the water
+  DUMP:             new LatchingPinPair(8, 9, LATCHING_DELAY),    // Dump Valve
+  POWER_CHANNEL:    new LatchingPinPair(10 , 11, LATCHING_DELAY), // EDR charges the water
+  POWER:            new Pin(12),  // High Power Circuit
+  PUMP:             new Pin(13),  // Pump
 };
+
+// OLD
+// var CONTROL = {
+//   MASTER:           new LatchingPinPair(12 , 13 , 200),
+//   POWER:            new Pin(4),
+//   PUMP:             new Pin(7),
+//   POWER_CHANNEL:    new LatchingPinPair(8 , 9 , 200),
+//   VALVE_CHANNEL:    new LatchingPinPair(10, 11, 200),
+//   DUMP:             new LatchingPinPair(2, 3, 200),
+// };
 
 const TEST_DELAY = 1000 * 60,
   STEPS_DELAY = 200;
