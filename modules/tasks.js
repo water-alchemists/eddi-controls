@@ -4,7 +4,7 @@ const superagent = require('superagent');
 const config = require('../config');
 
 function alertEddiState(stateText, reason){
-    const URL = `${config.homeUrl}/${id}`,
+    const URL = `${config.homeUrl}/${config.id}`,
         mapping = {
 			OFF : 0,
 			PRIME : 1,
