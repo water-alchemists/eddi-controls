@@ -17,7 +17,7 @@ function alertEddiState(stateText, reason){
 			updated : Math.floor(new Date().getTime() / 1000),
             reason : reason
 		};
-    console.log('this is the state', update);
+    console.log('sending state', state);
     return new Promise((resolve, reject) => {
         superagent.put(URL)
             .send(update)

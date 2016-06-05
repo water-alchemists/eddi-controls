@@ -305,7 +305,6 @@ function getCycleState(search){
 */
 
 function nextCycle(){
-  console.log('evaluating in next cycle');
   var currentCycle = refs.currentCycle,
     targetCycle;
   switch(currentCycle){
@@ -330,17 +329,33 @@ function nextCycle(){
   }
 
   // Trigger next cycle
-  if( targetCycle !== refs.currentCycle ){
-    console.log('in triggering next cycle');
-    return targetCycle()
-            .then( () => {
-              refs.currentCycle = targetCycle;
-              return alertCloudState(getCycleState(targetCycle), refs.reason);
-            });
-  } else {
-    console.log('in the else');
-    return alertCloudState(getCycle(targetCycle), refs.reason);
+  // NEW
+  let magic; 
+  if(targetCycle !== currentCycle){
+    console.log('in triggering next cycle because it should progress');
+    refs.currentCycle = targetCycle;
+    magic = targetCycle();
   }
+  else magic = Promise.resolve();
+  
+  // alert cloud
+  alertCloudState(getCycleState(targetCycle), refs.reason);
+  
+  // perform result of triggering the next cycle
+  return magic;
+  
+  // OLD
+  // if( targetCycle !== refs.currentCycle ){
+  //   console.log('in triggering next cycle');
+  //   return targetCycle()
+  //           .then( () => {
+  //             refs.currentCycle = targetCycle;
+  //             return alertCloudState(getCycleState(targetCycle), refs.reason);
+  //           });
+  // } else {
+  //   console.log('in the else');
+  //   return alertCloudState(getCycle(targetCycle), refs.reason);
+  // }
 }
 
 
@@ -358,6 +373,7 @@ function loop(){
         });
     }
     else console.log('Currently locked. In the middle of cycle:', getCycleState(refs.currentCycle));
+    
   }, 3000);
   // this pattern prevents tail recursion
 }
