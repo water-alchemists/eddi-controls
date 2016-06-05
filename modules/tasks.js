@@ -17,10 +17,10 @@ function alertEddiState(stateText, reason){
 			updated : Math.floor(new Date().getTime() / 1000),
             reason : reason
 		};
-
+    console.log('this is the state', update);
     return new Promise((resolve, reject) => {
         superagent.put(URL)
-            .send(state)
+            .send(update)
             .end((err, data) => {
                 if(err) return reject(err);
                 resolve(data);

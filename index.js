@@ -339,7 +339,7 @@ function nextCycle(){
             });
   } else {
     console.log('in the else');
-    return Promise.resolve();
+    return alertCloudState(getCycle(targetCycle), refs.reason);
   }
 }
 
