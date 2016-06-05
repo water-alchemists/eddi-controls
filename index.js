@@ -394,6 +394,7 @@ process.on('SIGINT', () => {
   const offPromises = controlKeys.map( key => CONTROL[key].off() );
   return Promise.all(offPromises)
           .then(() => console.log('All pins are turned off.'))
+          .then(() => alertCloudState('OFF', 'exit'))
           // .then(() => EddiFire.exit())
           // .then(() => console.log('EddiFire removed all event listeners.'))
           .then(() => process.exit());
@@ -403,6 +404,7 @@ process.on('beforeExit', () => {
   const offPromises = controlKeys.map( key => CONTROL[key].off() );
   return Promise.all(offPromises)
           .then(() => console.log('All pins are turned off.'))
+          .then(() => alertCloudState('OFF', 'exit'))
           // .then(() => EddiFire.exit())
           // .then(() => console.log('EddiFire removed all event listeners.'))
           .then(() => process.exit());
