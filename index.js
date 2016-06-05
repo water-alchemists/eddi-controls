@@ -325,7 +325,7 @@ function nextCycle(){
 
   // Check for if it should go off;
   if(!refs.running) {
-    console.log('cloud suggest to have it off');
+    console.log('cloud suggest to have it off because of', refs.reason);
     targetCycle = CYCLE.OFF;
   }
 
