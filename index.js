@@ -52,6 +52,16 @@ function createStepDelay(){
   return promiseAdditions.delay(STEPS_DELAY);
 }
 
+function checkOffCreateDelay(running){
+  // if the machine is being request to stop, stop the cycle mid-way
+  return running ? createStopDelay() : Promise.reject();
+}
+
+function isErrorRemove(error){
+  // if the error thrown is actually a request to stop the cycle prematurely due to the user requesting for the machine to stop
+  return !!error ? Promise.reject(error) : Promise.resolve();
+}
+
 var CYCLE = {
   OFF: function(){
     console.log('OFF triggered.');
