@@ -6,12 +6,12 @@ const TIME_DELAY = 3000;
 const LATCHING_DELAY = 500;
 
 var CONTROL = {
-  MASTER:           new LatchingPinPair(2 , 3 , LATCHING_DELAY),
-  POWER:            new Pin(4),
-  PUMP:             new Pin(7),
-  POWER_CHANNEL:    new LatchingPinPair(8 , 9 , LATCHING_DELAY),
-  VALVE_CHANNEL:    new LatchingPinPair(10, 11, LATCHING_DELAY),
-  DUMP:             new LatchingPinPair(12, 13, LATCHING_DELAY),
+  // MASTER:           new LatchingPinPair(2 , 3 , LATCHING_DELAY),
+  VALVE_CHANNEL:    new LatchingPinPair(2, 3, LATCHING_DELAY),    // Recirculation Valves - Controls the direction of the water
+  DUMP:             new LatchingPinPair(8, 9, LATCHING_DELAY),    // Dump Valve
+  POWER_CHANNEL:    new LatchingPinPair(10 , 11, LATCHING_DELAY), // EDR charges the water
+  POWER:            new Pin(12),  // High Power Circuit
+  PUMP:             new Pin(13),  // Pump
 };
 
 
@@ -21,9 +21,9 @@ function test(){
   console.log("Beginning Test...");
   return CONTROL.MASTER.setB() // open
       .then(() => promiseAdditions.delay(TIME_DELAY))
-      .then(() => CONTROL.MASTER.setA())
-      .then(() => console.log("Master Valve Test Success"))
-      .then(() => promiseAdditions.delay(TIME_DELAY))
+      // .then(() => CONTROL.MASTER.setA())
+      // .then(() => console.log("Master Valve Test Success"))
+      // .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.POWER.on())
       .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.POWER.off())
