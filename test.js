@@ -19,12 +19,12 @@ var CONTROL = {
 
 function test(){
   console.log("Beginning Test...");
-  return CONTROL.MASTER.setB() // open
-      .then(() => promiseAdditions.delay(TIME_DELAY))
+  // return CONTROL.MASTER.setB() // open
+  //     .then(() => promiseAdditions.delay(TIME_DELAY))
       // .then(() => CONTROL.MASTER.setA())
       // .then(() => console.log("Master Valve Test Success"))
       // .then(() => promiseAdditions.delay(TIME_DELAY))
-      .then(() => CONTROL.POWER.on())
+      return CONTROL.POWER.on()
       .then(() => promiseAdditions.delay(TIME_DELAY))
       .then(() => CONTROL.POWER.off())
       .then(() => console.log("High Power Test Success"))
